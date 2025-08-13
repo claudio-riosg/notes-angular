@@ -1,0 +1,119 @@
+.home-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-2xl);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-2xl);
+}
+
+.hero {
+  text-align: center;
+  padding: var(--spacing-6xl) var(--spacing-2xl);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primaryDark) 100%);
+  border-radius: var(--radius-xl);
+  color: var(--color-background);
+  margin-bottom: var(--spacing-6xl);
+}
+
+.hero__title {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.hero__subtitle {
+  font-size: var(--font-size-xl);
+  opacity: 0.9;
+  margin: 0 0 var(--spacing-3xl) 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: var(--line-height-relaxed);
+}
+
+.hero__actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+}
+
+/* CTA now uses global .btn styles */
+
+.features {
+  text-align: center;
+}
+
+.features__title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-5xl) 0;
+}
+
+.features__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-3xl);
+  margin-top: var(--spacing-5xl);
+}
+
+.feature-card {
+  background: var(--color-backgroundMuted);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3xl) var(--spacing-2xl);
+  border: 1px solid var(--color-border);
+  transition: all var(--animation-duration-normal) var(--animation-easing-out);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-borderMuted);
+}
+
+.feature-card__icon {
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.feature-card__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.feature-card__description {
+  color: var(--color-textMuted);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+@media (max-width: var(--breakpoint-md)) {
+  .home-page {
+    padding: var(--spacing-lg);
+  }
+
+  .hero {
+    padding: var(--spacing-5xl) var(--spacing-2xl);
+  }
+
+  .hero__title {
+    font-size: var(--font-size-3xl);
+  }
+
+  .hero__subtitle {
+    font-size: var(--font-size-lg);
+  }
+
+  .features__grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-2xl);
+  }
+
+  .feature-card {
+    padding: var(--spacing-2xl) var(--spacing-xl);
+  }
+}

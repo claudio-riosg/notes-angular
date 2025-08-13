@@ -1,0 +1,138 @@
+@let currentTagValue = currentTag();
+@let showSuggestionsList = showSuggestions();
+@let titleError = getFieldError('title');
+@let contentError = getFieldError('content');
+
+<form class="note-form" [formGroup]="noteForm" (ngSubmit)="onSubmit($event)">
+  <div class="note-form__header">
+    <input
+      type="text"
+      class="note-form__title"
+      formControlName="title"
+      placeholder="Note title..."
+      aria-label="Note title"
+      [class.note-form__title--error]="titleError">
+
+    <div class="note-form__actions">
+      @if (isEditMode()) {
+        <button
+          type="button"
+          class="note-form__pin-btn"
+          [class.note-form__pin-btn--active]="noteForm.get('isPinned')?.value"
+          (click)="togglePin()"
+          title="Pin note">
+          📌
+        </button>
+      }
+
+      <button
+        type="button"
+        class="note-form__close"
+        (click)="onCancel()"
+        title="Close">
+        ✕
+      </button>
+    </div>
+  </div>
+
+  @if (titleError) {
+    <div class="note-form__error">
+      {{ titleError }}
+    </div>
+  }
+
+  <div class="note-form__content">
+    <textarea
+      class="note-form__textarea"
+      formControlName="content"
+      placeholder="Start writing your note..."
+      aria-label="Note content"
+      rows="8"
+      [class.note-form__textarea--error]="contentError">
+    </textarea>
+
+    @if (contentError) {
+      <div class="note-form__error">
+        {{ contentError }}
+      </div>
+    }
+  </div>
+
+  <div class="note-form__footer">
+    <div class="note-form__colors">
+      <span class="note-form__colors-label">Color:</span>
+      @for (color of availableColors; track color) {
+        <button
+          type="button"
+          class="note-form__color"
+          [class]="'note-form__color--' + color"
+          [class.note-form__color--active]="noteForm.get('color')?.value === color"
+          (click)="setColor(color)"
+          [title]="getColorName(color)"
+          [attr.aria-label]="'Select ' + getColorName(color) + ' color'">
+        </button>
+      }
+    </div>
+
+    <div class="note-form__tags">
+      <div class="note-form__tags-input">
+        <input
+          type="text"
+          class="note-form__tag-input"
+          [value]="currentTagValue"
+          (input)="onTagInput($event)"
+          (keydown)="onTagKeydown($event)"
+          aria-label="Add tag"
+          placeholder="Add tags (press Enter or comma)..."
+          #tagInput>
+      </div>
+      
+      @if (currentTags().length > 0) {
+        <div class="note-form__tag-list">
+          @for (tag of currentTags(); track tag) {
+            <span class="note-form__tag">
+              #{{ tag }}
+              <button
+                type="button"
+                class="note-form__tag-remove"
+                (click)="removeTag(tag)"
+                title="Remove tag">
+                ✕
+              </button>
+            </span>
+          }
+        </div>
+      }
+
+      @if (filteredSuggestions().length > 0 && showSuggestionsList) {
+        <div class="note-form__suggestions">
+          @for (suggestion of filteredSuggestions(); track suggestion) {
+            <button
+              type="button"
+              class="btn btn--ghost btn--sm"
+              (click)="addTag(suggestion)">
+              #{{ suggestion }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="note-form__submit">
+      <button
+        type="button"
+        class="btn btn--secondary btn--md"
+        (click)="onCancel($event)">
+        Cancel
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn--primary btn--md"
+        [class.btn--loading]="isSubmitting()"
+        [disabled]="!noteForm.valid || isSubmitting()">
+        {{ isEditMode() ? 'Update Note' : 'Create Note' }}
+      </button>
+    </div>
+  </div>
+</form>

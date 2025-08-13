@@ -1,0 +1,311 @@
+:host {
+  display: block;
+}
+
+/* Host state styles */
+:host(.note-form--submitting) .note-form {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.note-form {
+  background: var(--color-background);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  max-width: 600px;
+  width: 100%;
+  max-height: 85vh;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  border-left: 4px solid var(--note-border-color, transparent);
+}
+
+.note-form__header {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xl) var(--spacing-2xl) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+}
+
+.note-form__title {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  background: transparent;
+  margin-right: var(--spacing-lg);
+  transition: box-shadow var(--animation-duration-normal) var(--animation-easing-out);
+}
+
+.note-form__title:focus {
+  box-shadow: 0 0 0 2px var(--color-borderFocus);
+  border-radius: var(--radius-sm);
+}
+
+.note-form__title--error {
+  color: var(--color-danger);
+}
+
+.note-form__title::placeholder {
+  color: var(--color-textMuted);
+}
+
+.note-form__error {
+  padding: var(--spacing-sm) var(--spacing-2xl);
+  background: var(--color-dangerLight);
+  border-left: 4px solid var(--color-danger);
+  color: var(--color-dangerDark);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.note-form__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.note-form__pin-btn,
+.note-form__close {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.note-form__pin-btn:hover,
+.note-form__close:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.note-form__pin-btn--active {
+  color: #f59e0b;
+  transform: rotate(45deg);
+}
+
+.note-form__content {
+  flex: 1;
+  padding: 0 24px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Allow flexbox shrinking */
+}
+
+.note-form__textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  padding: var(--spacing-md);
+  border: none;
+  outline: none;
+  resize: none;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text);
+  background: transparent;
+  font-family: var(--font-family-sans);
+  transition: box-shadow var(--animation-duration-normal) var(--animation-easing-out);
+}
+
+.note-form__textarea:focus {
+  box-shadow: inset 0 0 0 2px var(--color-borderFocus);
+  border-radius: var(--radius-sm);
+}
+
+.note-form__textarea--error {
+  color: var(--color-danger);
+}
+
+.note-form__textarea::placeholder {
+  color: var(--color-textMuted);
+}
+
+.note-form__footer {
+  padding: var(--spacing-lg) var(--spacing-2xl) var(--spacing-xl);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.note-form__colors {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.note-form__colors-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-textMuted);
+  margin-right: var(--spacing-sm);
+}
+
+.note-form__color {
+  width: 28px;
+  height: 28px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--animation-duration-normal) var(--animation-easing-out);
+  position: relative;
+}
+
+.note-form__color:hover {
+  transform: scale(1.1);
+}
+
+.note-form__color--active {
+  box-shadow: 0 0 0 2px var(--color-borderFocus);
+}
+
+.note-form__color--active::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Color variants using design tokens */
+.note-form__color--yellow { background-color: var(--color-noteYellow); }
+.note-form__color--blue { background-color: var(--color-noteBlue); }
+.note-form__color--green { background-color: var(--color-noteGreen); }
+.note-form__color--red { background-color: var(--color-noteRed); }
+.note-form__color--purple { background-color: var(--color-notePurple); }
+.note-form__color--orange { background-color: var(--color-noteOrange); }
+.note-form__color--pink { background-color: var(--color-notePink); }
+.note-form__color--gray { background-color: var(--color-noteGray); }
+
+.note-form__tags {
+  position: relative;
+}
+
+.note-form__tags-input {
+  margin-bottom: var(--spacing-md);
+}
+
+.note-form__tag-input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  outline: none;
+  transition: all var(--animation-duration-normal) var(--animation-easing-out);
+}
+
+.note-form__tag-input:focus {
+  box-shadow: 0 0 0 3px var(--color-primaryLight);
+}
+
+.note-form__tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.note-form__tag {
+  background: var(--color-backgroundMuted);
+  color: var(--color-text);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  border: 1px solid var(--color-border);
+  transition: all var(--animation-duration-normal) var(--animation-easing-out);
+}
+
+.note-form__tag:hover {
+  background: var(--color-borderMuted);
+}
+
+.note-form__tag-remove {
+  background: none;
+  border: none;
+  color: var(--color-textMuted);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.note-form__tag-remove:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.note-form__suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+/* suggestion items use global .btn styles */
+
+.note-form__submit {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+
+/* Button styles now handled by global .btn classes */
+
+@media (max-width: 768px) {
+  .note-form {
+    max-height: 95vh;
+    border-radius: var(--radius-lg);
+    margin: var(--spacing-sm);
+    width: calc(100% - var(--spacing-lg));
+  }
+
+  .note-form__header,
+  .note-form__content,
+  .note-form__footer {
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
+  }
+
+  .note-form__submit {
+    flex-direction: column-reverse;
+  }
+
+  /* Mobile button styles now handled by global .btn classes */
+
+  .note-form__colors {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,61 @@
+.note-context-menu {
+  position: fixed;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--zIndex-dropdown);
+  min-width: 180px;
+  padding: 8px 0;
+  animation: fadeIn var(--animation-duration-fast) var(--animation-easing-out);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.note-context-menu__item {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  transition: background-color var(--animation-duration-fast) var(--animation-easing-out);
+}
+
+.note-context-menu__item:hover {
+  background-color: var(--color-backgroundSecondary);
+}
+
+.note-context-menu__item--danger {
+  color: var(--color-danger);
+}
+
+.note-context-menu__item--danger:hover {
+  background-color: var(--color-dangerLight);
+}
+
+.note-context-menu__icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.note-context-menu__separator {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 4px 0;
+}

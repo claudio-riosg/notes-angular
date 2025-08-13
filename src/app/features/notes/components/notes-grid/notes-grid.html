@@ -1,0 +1,58 @@
+<div class="notes-grid">
+    <!-- Pinned Notes Section -->
+    @if (pinnedNotes().length > 0) {
+      <section class="notes-section">
+          <h3 class="notes-section__title" aria-live="polite">📌 Pinned Notes</h3>
+        <div class="notes-grid__container">
+          @for (note of pinnedNotes(); track note.id) {
+            <note-card
+              [note]="note"
+              (cardClick)="onNoteClick($event)"
+              (togglePin)="onTogglePin($event)"
+              (menuClick)="onMenuClick($event)"
+              (tagClick)="onTagClick($event)">
+            </note-card>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Regular Notes Section -->
+    @if (unpinnedNotes().length > 0) {
+      <section class="notes-section">
+        @if (pinnedNotes().length > 0) {
+          <h3 class="notes-section__title" aria-live="polite">📝 Notes</h3>
+        }
+        <div class="notes-grid__container">
+          @for (note of unpinnedNotes(); track note.id) {
+            <note-card
+              [note]="note"
+              (cardClick)="onNoteClick($event)"
+              (togglePin)="onTogglePin($event)"
+              (menuClick)="onMenuClick($event)"
+              (tagClick)="onTagClick($event)">
+            </note-card>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Empty State -->
+    @if (pinnedNotes().length === 0 && unpinnedNotes().length === 0) {
+      <div class="notes-grid__empty" role="status" aria-live="polite">
+        <div class="notes-grid__empty-content">
+          <span class="notes-grid__empty-icon">📝</span>
+          <h3 class="notes-grid__empty-title">{{ emptyTitle() }}</h3>
+          <p class="notes-grid__empty-message">{{ emptyMessage() }}</p>
+          @if (showCreateButton()) {
+            <button 
+              class="btn btn--primary btn--md"
+              (click)="onCreateNote()"
+              type="button">
+              Create Your First Note
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>

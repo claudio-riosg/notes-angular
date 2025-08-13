@@ -1,0 +1,142 @@
+<div class="notes-page">
+  <header class="notes-header">
+    <div class="notes-header__top">
+      <h1 class="notes-header__title">My Notes</h1>
+      <div class="notes-header__actions">
+        <button 
+          type="button"
+          class="btn btn--primary btn--md"
+          (click)="onCreateNote()"
+          [disabled]="notesService.isCreating()"
+          [attr.aria-busy]="notesService.isCreating()">
+          ✏️ New Note
+        </button>
+      </div>
+    </div>
+    
+    <div class="notes-header__filters">
+      <search-bar
+        [searchTerm]="notesService.filter().searchTerm"
+        (searchChange)="onSearchChange($event)"
+        (clear)="onSearchClear()">
+      </search-bar>
+      
+      <div class="notes-header__filter-controls">
+        <button 
+          type="button"
+          [class]="'btn btn--sm ' + (notesService.filter().showPinnedOnly ? 'btn--primary' : 'btn--secondary')"
+          (click)="onTogglePinnedFilter()">
+          📌 Pinned Only
+        </button>
+        
+        @if (notesService.hasActiveFilters()) {
+          <button 
+            type="button"
+            class="btn btn--ghost btn--sm"
+            (click)="onClearFilters()">
+            Clear Filters
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Stats -->
+    @if (notesService.totalNotesCount() > 0) {
+      <div class="notes-stats">
+        <span class="notes-stats__item">
+          Total: {{ notesService.totalNotesCount() }}
+        </span>
+        @if (notesService.filter().searchTerm || notesService.hasActiveFilters()) {
+          <span class="notes-stats__item">
+            Showing: {{ notesService.filteredNotes().length }}
+          </span>
+        }
+      </div>
+    }
+  </header>
+
+  <!-- Tag Filter -->
+  @if (notesService.allTags().length > 0) {
+    <aside class="notes-sidebar">
+      <tag-filter
+        [availableTags]="notesService.allTags()"
+        [selectedTags]="notesService.filter().selectedTags"
+        (tagToggle)="onTagToggle($event)"
+        (clearTags)="onClearTagFilters()">
+      </tag-filter>
+    </aside>
+  }
+
+  <!-- Loading State -->
+  @if (notesService.isLoading()) {
+    <div class="notes-loading">
+      <div class="notes-loading__spinner"></div>
+      <p>Loading notes...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (notesService.error()) {
+    <div class="notes-error">
+      <p>{{ notesService.error() }}</p>
+      <button 
+        type="button"
+        class="btn btn--danger btn--sm"
+        (click)="onRetry()">
+        Retry
+      </button>
+    </div>
+  }
+
+  <!-- Notes Grid -->
+  @if (!notesService.isLoading() && !notesService.error()) {
+    <main class="notes-content">
+      @defer (on viewport) {
+        <notes-grid
+          [pinnedNotes]="notesService.pinnedNotes()"
+          [unpinnedNotes]="notesService.unpinnedNotes()"
+          [emptyTitle]="getEmptyTitle()"
+          [emptyMessage]="getEmptyMessage()"
+          [showCreateButton]="!notesService.hasActiveFilters()"
+          (noteClick)="onNoteClick($event)"
+          (togglePin)="onTogglePin($event)"
+          (menuClick)="onMenuClick($event)"
+          (tagClick)="onTagClick($event)"
+          (createNote)="onCreateNote()">
+        </notes-grid>
+      } @placeholder {
+        <div class="notes-loading">
+          <div class="notes-loading__spinner"></div>
+          <p>Loading notes...</p>
+        </div>
+      } @loading {
+        <div class="notes-loading">
+          <div class="notes-loading__spinner"></div>
+          <p>Preparing notes grid...</p>
+        </div>
+      }
+    </main>
+  }
+
+  <!-- Note Modal -->
+  <note-modal
+    [isOpen]="modalOpen()"
+    [note]="noteForEdit()"
+    [availableTags]="notesService.allTags()"
+    [isSubmitting]="isSubmitting()"
+    (close)="onCloseModal()"
+    (submit)="onModalSubmit($event)">
+  </note-modal>
+
+  <!-- Context Menu -->
+  <note-context-menu
+    [isVisible]="contextMenuOpen()"
+    [note]="contextMenuNote()"
+    [position]="contextMenuPosition()"
+    (edit)="onEditFromMenu($event)"
+    (togglePin)="onTogglePin($event.id)"
+    (duplicate)="onDuplicateNote($event)"
+    (delete)="onDeleteNote($event)"
+    (close)="onCloseContextMenu()">
+  </note-context-menu>
+</div>

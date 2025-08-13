@@ -1,0 +1,42 @@
+@if (isVisible()) {
+  @let menuNote = note();
+  <div
+    class="note-context-menu"
+    [style.left.px]="position().x"
+    [style.top.px]="position().y"
+    role="menu"
+    aria-label="Note actions menu">
+
+    <button
+      class="note-context-menu__item"
+      (click)="onEdit(menuNote!)">
+      <span class="note-context-menu__icon">✏️</span>
+      Edit Note
+    </button>
+
+    <button
+      class="note-context-menu__item"
+      (click)="onTogglePin(menuNote!)">
+      <span class="note-context-menu__icon">
+        {{ menuNote?.isPinned ? '📌' : '📍' }}
+      </span>
+      {{ menuNote?.isPinned ? 'Unpin Note' : 'Pin Note' }}
+    </button>
+
+    <button
+      class="note-context-menu__item"
+      (click)="onDuplicate(menuNote!)">
+      <span class="note-context-menu__icon">📄</span>
+      Duplicate Note
+    </button>
+
+    <hr class="note-context-menu__separator">
+
+    <button
+      class="note-context-menu__item note-context-menu__item--danger"
+      (click)="onDelete(menuNote!)">
+      <span class="note-context-menu__icon">🗑️</span>
+      Delete Note
+    </button>
+  </div>
+}
