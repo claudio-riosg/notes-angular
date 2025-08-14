@@ -182,7 +182,6 @@
   font-weight: var(--font-weight-bold);
 }
 
-/* Color variants using design tokens */
 .note-form__color--yellow { background-color: var(--color-noteYellow); }
 .note-form__color--blue { background-color: var(--color-noteBlue); }
 .note-form__color--green { background-color: var(--color-noteGreen); }
@@ -274,15 +273,11 @@
   overflow-y: auto;
 }
 
-/* suggestion items use global .btn styles */
-
 .note-form__submit {
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-md);
 }
-
-/* Button styles now handled by global .btn classes */
 
 @media (max-width: 768px) {
   .note-form {
@@ -302,8 +297,6 @@
   .note-form__submit {
     flex-direction: column-reverse;
   }
-
-  /* Mobile button styles now handled by global .btn classes */
 
   .note-form__colors {
     flex-wrap: wrap;

@@ -117,10 +117,10 @@ export class NoteForm {
       event.preventDefault();
       event.stopPropagation();
     }
-    console.log('🔍 onSubmit called with:', { event, formData: this.noteForm.value });
+    console.log('onSubmit called: ', { event, formData: this.noteForm.value });
     // Prevent submission if already submitting
     if (this.isSubmitting()) {
-      console.log('⚠️ Already submitting, ignoring...');
+      console.log('Already submitting, ignoring...');
       return;
     }
 

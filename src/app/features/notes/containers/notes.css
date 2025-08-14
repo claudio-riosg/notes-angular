@@ -33,8 +33,6 @@
   gap: var(--spacing-md);
 }
 
-/* Removed - now using ui-button component */
-
 .notes-header__filters {
   display: flex;
   flex-direction: column;
@@ -48,7 +46,6 @@
   align-items: center;
 }
 
-/* Filter buttons now use ui-button component */
 .notes-stats {
   display: flex;
   gap: var(--spacing-lg);

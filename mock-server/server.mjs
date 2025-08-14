@@ -2,7 +2,7 @@ import http from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { URL } from 'node:url';
 
-const PORT = process.env.MOCK_PORT ? Number(process.env.MOCK_PORT) : 4300;
+const PORT = process.env.MOCK_PORT ? Number(process.env.MOCK_PORT) : 3000;
 const API_PREFIX = '/api/notes';
 
 /** In-memory dataset (seed) */

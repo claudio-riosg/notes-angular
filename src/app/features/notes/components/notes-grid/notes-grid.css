@@ -56,8 +56,6 @@
   margin: 0 0 var(--spacing-xl) 0;
 }
 
-/* button styles moved to global .btn classes */
-
 @media (max-width: 768px) {
   .notes-grid__container {
     grid-template-columns: 1fr;

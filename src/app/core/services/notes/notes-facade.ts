@@ -1,38 +1,55 @@
-import { Injectable, inject, computed, effect, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { toSignal, toObservable } from '@angular/core/rxjs-interop';
-import { firstValueFrom } from 'rxjs';
-import { switchMap, catchError, of, debounceTime, distinctUntilChanged } from 'rxjs';
-import { NotesStateService } from './notes-state';
-import { NotesFilterService } from './notes-filter';
-import { Note, CreateNoteRequest, UpdateNoteRequest, NoteColor } from '@core/models';
-import { NotesApiClient } from './notes-api-client';
+import {
+  Injectable,
+  inject,
+  computed,
+  effect,
+  PLATFORM_ID,
+} from "@angular/core";
+import { isPlatformBrowser } from "@angular/common";
+import { toSignal, toObservable } from "@angular/core/rxjs-interop";
+import { firstValueFrom } from "rxjs";
+import {
+  switchMap,
+  catchError,
+  of,
+  debounceTime,
+  distinctUntilChanged,
+} from "rxjs";
+import { NotesStateService } from "./notes-state";
+import { NotesFilterService } from "./notes-filter";
+import {
+  Note,
+  CreateNoteRequest,
+  UpdateNoteRequest,
+  NoteColor,
+} from "@core/models";
+import { NotesApiClient } from "./notes-api-client";
 
 /**
  * Facade de dominio para Notas (signal-first).
  *
- * Responsabilidades:
- * - Orquestar carga/guardado de datos (delegando en data service)
- * - Exponer estado readonly desde el state service
- * - Definir estado derivado con `computed()`
- * - Gestionar efectos de auto-guardado y carga inicial
- * - Ofrecer API CRUD + filtros/selección para contenedores
+ * Responsabilities:
+ * Orchestrate data loading/saving (delegating to the data service)
+ * Expose readonly state from the state service
+ * Define derived state with `computed()`
+ * Manage auto-save effects and initial loading
+ * Provide CRUD API + filters/selection for containers
+ * No logic of ui.
  *
- * No contiene lógica de UI ni detalles de presentación.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class NotesService {
   private platformId = inject(PLATFORM_ID);
   private isBrowser = isPlatformBrowser(this.platformId);
-  
+
   private notesStateService = inject(NotesStateService);
   private notesApiClient = inject(NotesApiClient);
   private notesFilterService = inject(NotesFilterService);
 
   // Reactive data loading with platform awareness
   private notesData = toSignal(
-    // Skip reactive chain during SSR
-    !this.isBrowser 
+    // Skip reactive chain during post SSR
+    !this.isBrowser
       ? of([])
       : toObservable(this.notesStateService.filter).pipe(
           debounceTime(200),
@@ -49,9 +66,13 @@ export class NotesService {
             }
             return true;
           }),
-          switchMap(() => this.notesApiClient.getNotes(this.notesStateService.filter())),
-          catchError(error => {
-            this.notesStateService.setError(error.message || 'Failed to load notes');
+          switchMap(() =>
+            this.notesApiClient.getNotes(this.notesStateService.filter())
+          ),
+          catchError((error) => {
+            this.notesStateService.setError(
+              error.message || "Failed to load notes"
+            );
             return of([]);
           })
         ),
@@ -68,7 +89,7 @@ export class NotesService {
   readonly totalNotesCount = this.notesStateService.totalNotesCount;
   readonly isCreating = this.notesStateService.isCreating;
 
-  // Computed derived state (estado derivado solo-lectura)
+  // Computed derived state - just read
   readonly filteredNotes = computed(() => {
     const notes = this.notes();
     const filter = this.filter();
@@ -76,20 +97,20 @@ export class NotesService {
     return this.notesFilterService.sortNotes(filtered);
   });
 
-  readonly pinnedNotes = computed(() => 
-    this.filteredNotes().filter(note => note.isPinned)
+  readonly pinnedNotes = computed(() =>
+    this.filteredNotes().filter((note) => note.isPinned)
   );
 
-  readonly unpinnedNotes = computed(() => 
-    this.filteredNotes().filter(note => !note.isPinned)
+  readonly unpinnedNotes = computed(() =>
+    this.filteredNotes().filter((note) => !note.isPinned)
   );
 
   readonly hasActiveFilters = computed(() => {
     const filter = this.filter();
     return !!(
-      filter.searchTerm || 
-      filter.selectedTags.length > 0 || 
-      filter.selectedColor || 
+      filter.searchTerm ||
+      filter.selectedTags.length > 0 ||
+      filter.selectedColor ||
       filter.showPinnedOnly
     );
   });
@@ -118,12 +139,14 @@ export class NotesService {
     try {
       this.notesStateService.setLoading(true);
       this.notesStateService.setError(null);
-      const notes = await firstValueFrom(this.notesApiClient.getNotes(this.notesStateService.filter()));
+      const notes = await firstValueFrom(
+        this.notesApiClient.getNotes(this.notesStateService.filter())
+      );
       if (notes) {
         this.notesStateService.setNotes(notes);
       }
     } catch (error: any) {
-      this.notesStateService.setError(error.message || 'Failed to load notes');
+      this.notesStateService.setError(error.message || "Failed to load notes");
     } finally {
       this.notesStateService.setLoading(false);
     }
@@ -133,14 +156,16 @@ export class NotesService {
     try {
       this.notesStateService.setCreating(true);
       this.notesStateService.setError(null);
-      const note = await firstValueFrom(this.notesApiClient.createNote(request));
+      const note = await firstValueFrom(
+        this.notesApiClient.createNote(request)
+      );
       if (note) {
         this.notesStateService.addNote(note);
         return note;
       }
       return null;
     } catch (error: any) {
-      this.notesStateService.setError(error.message || 'Failed to create note');
+      this.notesStateService.setError(error.message || "Failed to create note");
       return null;
     } finally {
       this.notesStateService.setCreating(false);
@@ -151,7 +176,9 @@ export class NotesService {
     try {
       this.notesStateService.startUpdating(request.id);
       this.notesStateService.setError(null);
-      const updatedNote = await firstValueFrom(this.notesApiClient.updateNote(request));
+      const updatedNote = await firstValueFrom(
+        this.notesApiClient.updateNote(request)
+      );
       if (updatedNote) {
         this.notesStateService.updateNote(updatedNote);
         if (this.selectedNote()?.id === updatedNote.id) {
@@ -161,7 +188,7 @@ export class NotesService {
       }
       return null;
     } catch (error: any) {
-      this.notesStateService.setError(error.message || 'Failed to update note');
+      this.notesStateService.setError(error.message || "Failed to update note");
       return null;
     } finally {
       this.notesStateService.stopUpdating(request.id);
@@ -176,7 +203,7 @@ export class NotesService {
       this.notesStateService.deleteNote(noteId);
       return true;
     } catch (error: any) {
-      this.notesStateService.setError(error.message || 'Failed to delete note');
+      this.notesStateService.setError(error.message || "Failed to delete note");
       return false;
     } finally {
       this.notesStateService.stopDeleting(noteId);
@@ -204,9 +231,9 @@ export class NotesService {
   toggleTag(tag: string): void {
     const currentTags = this.filter().selectedTags;
     const newTags = currentTags.includes(tag)
-      ? currentTags.filter(t => t !== tag)
+      ? currentTags.filter((t) => t !== tag)
       : [...currentTags, tag];
-    
+
     this.notesStateService.setSelectedTags(newTags);
   }
 
@@ -225,24 +252,24 @@ export class NotesService {
 
   // Utility methods
   togglePinNote(noteId: string): void {
-    const note = this.notes().find(n => n.id === noteId);
+    const note = this.notes().find((n) => n.id === noteId);
     if (note) {
       void this.updateNote({
         id: noteId,
-        isPinned: !note.isPinned
+        isPinned: !note.isPinned,
       });
     }
   }
 
   duplicateNote(noteId: string): void {
-    const note = this.notes().find(n => n.id === noteId);
+    const note = this.notes().find((n) => n.id === noteId);
     if (note) {
       void this.createNote({
         title: `${note.title} (Copy)`,
         content: note.content,
         tags: [...note.tags],
         color: note.color,
-        isPinned: false
+        isPinned: false,
       });
     }
   }

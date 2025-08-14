@@ -1,135 +1,214 @@
-# Notes Signals
+# Notes App - Angular 20 Signal-First Architecture
 
-Aplicación Angular 20 (standalone) con arquitectura signal-first para gestionar notas. Sirve como base de referencia 2025 para proyectos pequeños/medianos.
+Una aplicación de notas construida con **Angular 20** y **arquitectura signal-first**,
+con componentes standalone, control de flujo actular (@if, @for) y programación reactiva basada en signals.
 
-## Requisitos
+## 🚀 Stack Tecnológico
 
-- Node 20+
-- Angular CLI 20+
+- **Angular 20.1.0** - Componentes standalone + directivas de control de flujo modernas
+- **TypeScript 5.8.2** - Modo estricto con path aliases
+- **RxJS 7.8.0** - Solo para HTTP y casos específicos de reactivos
+- **CSS Custom Properties** - Variables CSS nativas sin preprocesadores
+- **Jest** - Framework de testing
+- **Node.js HTTP Server** - Mock server para desarrollo
 
-## Scripts
+## 🏗️ Arquitectura Signal-First
 
-- `npm start` — servidor de desarrollo en `http://localhost:4200`
-- `npm run build` — build de producción
-- `npm run watch` — build en modo watch (dev)
+### Patrones Principales
 
-## Arquitectura
+**1. Gestión de Estado Reactivo**
+```typescript
+// Estado centralizado con signals
+@Injectable({ providedIn: 'root' })
+export class NotesStateService {
+  private notesSignal = signal<Note[]>([]);
+  readonly notes = this.notesSignal.asReadonly();
+  
+  // Estado derivado automático
+  readonly allTags = computed(() => {
+    return this.notes().flatMap(note => note.tags);
+  });
+}
+```
 
-- Standalone components (sin NgModules)
-- Signal-first en servicios: `signal` para estado, `computed` para derivados, `effect` para side-effects
-- RxJS solo en IO (datos) y puente `toSignal/toObservable` cuando aplica
-- Organización por features en `src/app/features/*` y capa `core` para servicios/modelos
-- Aliases: `@app`, `@core`, `@shared`, `@features`
+**2. Facade de Dominio**
+```typescript
+// Orquestación signal-first
+@Injectable({ providedIn: 'root' })
+export class NotesService {
+  // Conversión RxJS → Signal con optimizaciones
+  private notesData = toSignal(
+    toObservable(this.notesStateService.filter).pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap(() => this.notesApiClient.getNotes()),
+    ),
+    { initialValue: [] }
+  );
+}
+```
 
-### Estructura
+**3. Container-Presentational Pattern**
+```typescript
+// Container: lógica de negocio
+@Component({
+  selector: 'notes',
+  imports: [NotesGrid, SearchBar],
+  template: `
+    @if (notesService.isLoading()) {
+      <div>Loading...</div>
+    }
+    <notes-grid 
+      [notes]="notesService.filteredNotes()"
+      (noteClick)="selectNote($event)">
+    </notes-grid>
+  `
+})
+export class Notes {
+  notesService = inject(NotesService);
+}
+
+// Presentational: UI pura
+@Component({
+  selector: 'notes-grid',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    @for (note of notes(); track note.id) {
+      <note-card [note]="note" (click)="noteClick.emit(note)">
+    }
+  `
+})
+export class NotesGrid {
+  notes = input.required<Note[]>();
+  noteClick = output<Note>();
+}
+```
+
+### Arquitectura de Servicios
+
+```
+src/app/core/services/notes/
+├── notes-facade.ts       # 🎯 Orquestador principal
+├── notes-state.ts        # 📊 Estado centralizado
+├── notes-api-client.ts   # 🌐 Cliente HTTP REST
+└── notes-filter.ts       # 🔍 Lógica de filtrado
+```
+
+**Responsabilidades:**
+- **NotesService** - Facade reactiva que orquesta estado, HTTP y filtros
+- **NotesStateService** - Estado único con signals + computed derivados
+- **NotesApiClient** - Comunicación HTTP (Observable → toSignal)
+- **NotesFilterService** - Filtrado, ordenamiento y estadísticas
+
+## 🎨 Sistema de Estilos
+
+**CSS Custom Properties**:
+```css
+:root {
+  /* Colores semánticos */
+  --color-primary: #10b981;
+  --color-primaryHover: #059669;
+  
+  /* Sistema de espaciado */
+  --spacing-sm: 8px;
+  --spacing-lg: 16px;
+  
+  /* Tipografía */
+  --font-size-base: 16px;
+  --font-weight-medium: 500;
+
+}
+```
+
+## 📁 Organización por Features
 
 ```
 src/app/
-├─ core/
-│  ├─ models/
-│  └─ services/
-│     └─ notes/
-├─ shared/
-│  ├─ ui/
-│  └─ design-tokens/
-└─ features/
-   ├─ home/
-   └─ notes/
-      ├─ containers/
-      └─ components/
+├── core/                    # Servicios singleton + modelos
+│   ├── services/notes/     # 4 servicios especializados  
+│   └── models/            # Interfaces TypeScript
+├── shared/ui/             # Componentes reutilizables
+└── features/              # Lazy loading por características
+    ├── home/             # Landing page
+    └── notes/            # Sistema de notas
+        ├── containers/   # Componentes inteligentes
+        └── components/   # Componentes presentacionales
 ```
 
-## Patrón Container/Presentational
+## 🔄 Desarrollo Dual (Mock + Angular)
 
-- Contenedores: inyectan la fachada de dominio (`NotesService`), coordinan flujos y manejan side-effects.
-- Presentacionales: solo `input()` y `output()`, sin inyectar servicios de negocio. Ej.: `note-modal` y `note-form`.
+**Terminal 1: Mock Server**
+```bash
+npm run mock:server  # Puerto 3000
+```
 
-## Facade signal-first (Notas)
+**Terminal 2: Angular App**  
+```bash
+npm start           # Puerto 4200 con proxy
+```
 
-- `NotesService` (facade): expone signals readonly del `NotesStateService`, define `computed` derivados, orquesta CRUD delegando a `NotesDataService`, y efectos de carga/auto-guardado.
-- `NotesStateService`: única fuente de verdad del estado (signals + `asReadonly()`), derivados (`allTags`, contadores) y mutadores dedicados.
-- `NotesFilterService`: lógica de filtrado/orden y stats; normaliza búsqueda (trim/diacríticos) y optimiza escaneos.
-- `NotesDataService`: datos de ejemplo + persistencia `localStorage`.
+## 📋 Scripts Disponibles
 
-## Guía Signal-First rápida
+### Desarrollo
+- `npm start` - Servidor Angular con proxy HTTP (puerto 4200)
+- `npm run mock:server` - Servidor mock HTTP (puerto 3000)  
+- `npm run build` - Build de producción
+- `npm run watch` - Build de desarrollo con watch
 
-- Do: Derivados con `computed()`; side-effects con `effect()`.
-- Do: Signals privados + `.asReadonly()` público.
-- Do: RxJS solo en capa de datos; puente con signals cuando haga falta.
-- Don’t: Inyectar servicios de dominio en componentes presentacionales.
-- Don’t: Mezclar filtros/orden en el componente; manténlos en el servicio.
+### Testing
+- `npm test` - Ejecutar todos los tests con Jest
+- `npm run test:watch` - Tests en modo watch
+- `npm run test:coverage` - Tests con coverage
 
-## Estilos y budgets
+## 🎯 Características Implementadas
 
-- Presupuesto por estilo de componente ajustado a `8kB` (warning) y `12kB` (error) en `angular.json`.
-- Preferir tokens desde `shared/design-tokens` y estilos globales en `src/styles.css` para reutilización.
+**Funcionalidades Core:**
+- ✅ CRUD completo de notas con API REST
+- ✅ Sistema de etiquetas con autocompletado
+- ✅ Filtrado avanzado (búsqueda, tags, colores, pinned)
+- ✅ Sistema de pinning con ordenamiento automático
+- ✅ Modal reactivo con validación de formularios
+- ✅ Context menu con acciones rápidas
+- ✅ Persistencia con mock server HTTP
 
-## Desarrollo
+**Optimizaciones de UX:**
+- ✅ Estados granulares por operación (`isUpdating(id)`, `isDeleting(id)`)
+- ✅ Debounce inteligente en búsquedas (200ms)
+- ✅ Loading states con `@defer` viewport
+- ✅ Feedback visual inmediato en todas las acciones
+- ✅ Responsive design con CSS Grid/Flexbox
 
-1. `npm install`
-2. `npm start`
-3. Abre `http://localhost:4200`
+## 🧪 Principios Signal-First
 
-## Testing
+**Do's ✅**
+- Estado con `signal()` privado + `.asReadonly()` público
+- Derivados automáticos con `computed()`
+- Side-effects con `effect()` para auto-guardado
+- RxJS solo en capa IO (HTTP) + puente `toSignal()`
+- Componentes presentacionales sin servicios de dominio
 
-- Specs pausados. El `tsconfig.app.json` excluye `*.spec.ts` del build.
+**Don'ts ❌**
+- No mezclar lógica de filtros en componentes
+- No usar RxJS para estado (usar signals)
+- No inyectar facade en componentes presentacionales
+- No usar CommonModule (eliminado en Angular 20)
+- No usar *ngIf/*ngFor (usar @if/@for)
 
-# NotesSignals
+**Optimizaciones de Rendimiento:**
+- OnPush change detection en todos los componentes
+- Lazy loading con code splitting automático
+- Tree shaking para eliminación de código no usado
+- CSS variables más eficientes que preprocesadores
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.5.
-
-## Development server
-
-To start a local development server, run:
+## 🔧 Setup Inicial
 
 ```bash
-ng serve
-```
+# Instalar dependencias
+npm install
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+# Desarrollo completo (2 terminales)
+npm run mock:server  # Terminal 1
+npm start           # Terminal 2
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+# Abrir navegador
+open http://localhost:4200

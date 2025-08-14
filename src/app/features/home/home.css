@@ -38,8 +38,6 @@
   gap: var(--spacing-lg);
 }
 
-/* CTA now uses global .btn styles */
-
 .features {
   text-align: center;
 }

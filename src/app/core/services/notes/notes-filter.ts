@@ -46,15 +46,12 @@ export class NotesFilterService {
             }
           }
         }
-        
         if (!matches) {
           return false;
         }
       }
 
-      // Tags filter
       if (hasTagFilter) {
-        // Any-match; early-exit scan
         let ok = false;
         for (let i = 0; i < selectedTags.length; i++) {
           if (note.tags.includes(selectedTags[i])) { ok = true; break; }
@@ -62,12 +59,10 @@ export class NotesFilterService {
         if (!ok) return false;
       }
 
-      // Color filter
       if (selectedColor && note.color !== selectedColor) {
         return false;
       }
 
-      // Pinned filter
       if (showPinnedOnly && !note.isPinned) {
         return false;
       }
@@ -77,13 +72,10 @@ export class NotesFilterService {
   }
 
   sortNotes(notes: Note[]): Note[] {
-    // Sort by: pinned first, then by updated date (newest first)
     return [...notes].sort((a, b) => {
       // Pinned notes come first
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
-      
-      // Then sort by updated date (newest first)
       return b.updatedAt.getTime() - a.updatedAt.getTime();
     });
   }

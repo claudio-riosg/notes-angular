@@ -86,7 +86,6 @@ describe('NotesFilterService', () => {
     });
 
     const sorted = service.sortNotes(filtered);
-    // Pinned note id=1 first, then id=3 (newest updated), then id=2
     expect(sorted.map(n => n.id)).toEqual(['1', '3', '2']);
   });
 });
