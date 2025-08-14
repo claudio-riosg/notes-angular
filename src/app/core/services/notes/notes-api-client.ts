@@ -8,7 +8,7 @@ interface NoteDto {
   title: string;
   content: string;
   createdAt: string; // ISO string
-  updatedAt: string; // ISO string
+  updatedAt: string;
   tags: string[];
   color: Note['color'];
   isPinned: boolean;

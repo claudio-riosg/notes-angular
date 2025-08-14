@@ -28,8 +28,6 @@
   z-index: -1;
 }
 
-/* Note color handled via host inline style from design tokens */
-
 .note-card__header {
   display: flex;
   justify-content: space-between;

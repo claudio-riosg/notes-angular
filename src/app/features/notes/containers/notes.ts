@@ -2,8 +2,8 @@ import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/cor
 import { NotesService } from '@core/services';
 import { Note, CreateNoteRequest, UpdateNoteRequest } from '@core/models';
 import { NotesGrid } from '../components/notes-grid/notes-grid';
-import { SearchBar } from '@shared/ui/search-bar';
-import { TagFilter } from '@shared/ui/tag-filter';
+import { SearchBar } from '@app/shared/ui/search-bar/search-bar';
+import { TagFilter } from '@shared/ui/tag-filter/tag-filter';
 import { NoteModal } from '../components/note-modal/note-modal';
 import { NoteContextMenu } from '../components/note-context-menu/note-context-menu';
 
