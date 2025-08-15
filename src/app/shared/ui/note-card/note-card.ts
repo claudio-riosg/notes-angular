@@ -1,7 +1,7 @@
 import { Component, input, output, computed, ChangeDetectionStrategy } from '@angular/core';
 import { Note, NoteColor } from '@core/models';
 import { inject } from '@angular/core';
-import { NotesService } from '@core/services';
+import { NotesOrchestrator } from '@core/services';
 
 @Component({
   selector: 'note-card',
@@ -19,7 +19,7 @@ import { NotesService } from '@core/services';
 })
 export class NoteCard {
   readonly note = input.required<Note>();
-  notesService = inject(NotesService);
+  orchestrator = inject(NotesOrchestrator);
   
   readonly cardClick = output<Note>();
   readonly togglePin = output<string>();
@@ -33,10 +33,10 @@ export class NoteCard {
     if (this.note().isPinned) {
       classes.push('note-card--pinned');
     }
-    if (this.notesService.isUpdating(this.note().id)) {
+    if (this.orchestrator.isUpdating(this.note().id)) {
       classes.push('note-card--updating');
     }
-    if (this.notesService.isDeleting(this.note().id)) {
+    if (this.orchestrator.isDeleting(this.note().id)) {
       classes.push('note-card--deleting');
     }
     

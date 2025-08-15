@@ -4,7 +4,7 @@ import { Note, NotesFilter, NoteColor } from '@core/models';
 @Injectable({
   providedIn: 'root'
 })
-export class NotesFilterService {
+export class NotesFilterUtils {
   // Precompute for diacritics removal
   private readonly diacriticsMap: Record<string, string> = {
     á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', ü: 'u', ñ: 'n',

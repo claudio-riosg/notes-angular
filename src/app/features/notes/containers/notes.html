@@ -7,8 +7,8 @@
           type="button"
           class="btn btn--primary btn--md"
           (click)="onCreateNote()"
-          [disabled]="notesService.isCreating()"
-          [attr.aria-busy]="notesService.isCreating()">
+          [disabled]="noteOrchestrator.isCreating()"
+          [attr.aria-busy]="noteOrchestrator.isCreating()">
           ✏️ New Note
         </button>
       </div>
@@ -16,7 +16,7 @@
     
     <div class="notes-header__filters">
       <search-bar
-        [searchTerm]="notesService.filter().searchTerm"
+        [searchTerm]="noteOrchestrator.filter().searchTerm"
         (searchChange)="onSearchChange($event)"
         (clear)="onSearchClear()">
       </search-bar>
@@ -24,12 +24,12 @@
       <div class="notes-header__filter-controls">
         <button 
           type="button"
-          [class]="'btn btn--sm ' + (notesService.filter().showPinnedOnly ? 'btn--primary' : 'btn--secondary')"
+          [class]="'btn btn--sm ' + (noteOrchestrator.filter().showPinnedOnly ? 'btn--primary' : 'btn--secondary')"
           (click)="onTogglePinnedFilter()">
           📌 Pinned Only
         </button>
         
-        @if (notesService.hasActiveFilters()) {
+        @if (noteOrchestrator.hasActiveFilters()) {
           <button 
             type="button"
             class="btn btn--ghost btn--sm"
@@ -41,14 +41,14 @@
     </div>
 
     <!-- Stats -->
-    @if (notesService.totalNotesCount() > 0) {
+    @if (noteOrchestrator.totalNotesCount() > 0) {
       <div class="notes-stats">
         <span class="notes-stats__item">
-          Total: {{ notesService.totalNotesCount() }}
+          Total: {{ noteOrchestrator.totalNotesCount() }}
         </span>
-        @if (notesService.filter().searchTerm || notesService.hasActiveFilters()) {
+        @if (noteOrchestrator.filter().searchTerm || noteOrchestrator.hasActiveFilters()) {
           <span class="notes-stats__item">
-            Showing: {{ notesService.filteredNotes().length }}
+            Showing: {{ noteOrchestrator.filteredNotes().length }}
           </span>
         }
       </div>
@@ -56,11 +56,11 @@
   </header>
 
   <!-- Tag Filter -->
-  @if (notesService.allTags().length > 0) {
+  @if (noteOrchestrator.allTags().length > 0) {
     <aside class="notes-sidebar">
       <tag-filter
-        [availableTags]="notesService.allTags()"
-        [selectedTags]="notesService.filter().selectedTags"
+        [availableTags]="noteOrchestrator.allTags()"
+        [selectedTags]="noteOrchestrator.filter().selectedTags"
         (tagToggle)="onTagToggle($event)"
         (clearTags)="onClearTagFilters()">
       </tag-filter>
@@ -68,7 +68,7 @@
   }
 
   <!-- Loading State -->
-  @if (notesService.isLoading()) {
+  @if (noteOrchestrator.isLoading()) {
     <div class="notes-loading">
       <div class="notes-loading__spinner"></div>
       <p>Loading notes...</p>
@@ -76,9 +76,9 @@
   }
 
   <!-- Error State -->
-  @if (notesService.error()) {
+  @if (noteOrchestrator.error()) {
     <div class="notes-error">
-      <p>{{ notesService.error() }}</p>
+      <p>{{ noteOrchestrator.error() }}</p>
       <button 
         type="button"
         class="btn btn--danger btn--sm"
@@ -89,15 +89,15 @@
   }
 
   <!-- Notes Grid -->
-  @if (!notesService.isLoading() && !notesService.error()) {
+  @if (!noteOrchestrator.isLoading() && !noteOrchestrator.error()) {
     <main class="notes-content">
       @defer (on viewport) {
         <notes-grid
-          [pinnedNotes]="notesService.pinnedNotes()"
-          [unpinnedNotes]="notesService.unpinnedNotes()"
+          [pinnedNotes]="noteOrchestrator.pinnedNotes()"
+          [unpinnedNotes]="noteOrchestrator.unpinnedNotes()"
           [emptyTitle]="getEmptyTitle()"
           [emptyMessage]="getEmptyMessage()"
-          [showCreateButton]="!notesService.hasActiveFilters()"
+          [showCreateButton]="!noteOrchestrator.hasActiveFilters()"
           (noteClick)="onNoteClick($event)"
           (togglePin)="onTogglePin($event)"
           (menuClick)="onMenuClick($event)"
@@ -122,7 +122,7 @@
   <note-modal
     [isOpen]="modalOpen()"
     [note]="noteForEdit()"
-    [availableTags]="notesService.allTags()"
+    [availableTags]="noteOrchestrator.allTags()"
     [isSubmitting]="isSubmitting()"
     (close)="onCloseModal()"
     (submit)="onModalSubmit($event)">
