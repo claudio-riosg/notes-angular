@@ -1,4 +1,4 @@
-export * from './notes-facade';
-export * from './notes-state';
-export * from './notes-filter';
+export * from './notes-orchestrator';
+export * from './notes-state-store';
+export * from './notes-filter-utils';
 export * from './notes-api-client';

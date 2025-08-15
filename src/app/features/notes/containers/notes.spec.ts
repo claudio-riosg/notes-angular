@@ -1,18 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { Notes } from './notes';
 import { NotesService } from '@core/services';
 
 class NotesServiceMock {
-  notes = jest.fn(() => [] as any);
-  pinnedNotes = jest.fn(() => [] as any);
-  unpinnedNotes = jest.fn(() => [] as any);
-  totalNotesCount = jest.fn(() => 0 as any);
-  error = jest.fn(() => null as any);
-  isLoading = jest.fn(() => false as any);
-  allTags = jest.fn(() => [] as any);
-  filter = jest.fn(() => ({ searchTerm: '', selectedTags: [], showPinnedOnly: false } as any));
-  hasActiveFilters = jest.fn(() => false);
-  isCreating = jest.fn(() => false as any);
+  // Signal-based mocks that return values like real signals
+  notes = signal([]);
+  pinnedNotes = signal([]);
+  unpinnedNotes = signal([]);
+  totalNotesCount = signal(0);
+  error = signal(null);
+  isLoading = signal(false);
+  allTags = signal([]);
+  filter = signal({ searchTerm: '', selectedTags: [], showPinnedOnly: false });
+  hasActiveFilters = signal(false);
+  isCreating = signal(false);
+  
+  // Method mocks
   togglePinNote = jest.fn();
   toggleTag = jest.fn();
   setSearchTerm = jest.fn();
@@ -23,6 +27,9 @@ class NotesServiceMock {
   updateNote = jest.fn();
   createNote = jest.fn();
   deleteNote = jest.fn();
+  duplicateNote = jest.fn();
+  isUpdating = jest.fn(() => false);
+  isDeleting = jest.fn(() => false);
 }
 
 describe('Notes container', () => {
@@ -46,7 +53,7 @@ describe('Notes container', () => {
 
   it('getEmptyTitle should reflect active filters', () => {
     const svc = TestBed.inject(NotesService) as unknown as NotesServiceMock;
-    svc.hasActiveFilters.mockReturnValueOnce(true);
+    svc.hasActiveFilters.set(true);
     expect(component.getEmptyTitle()).toBe('No matching notes');
   });
 });

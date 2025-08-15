@@ -4,7 +4,7 @@ import { Note, NotesFilter, NoteColor } from '@core/models';
 @Injectable({
   providedIn: 'root'
 })
-export class NotesStateService {
+export class NotesStateStore {
   private notesSignal = signal<Note[]>([]);
   private selectedNoteSignal = signal<Note | null>(null);
   private isLoadingSignal = signal(false);
@@ -83,25 +83,26 @@ export class NotesStateService {
     this.errorSignal.set(error);
   }
 
+  // Helper method for Set operations - DRY principle
+  private updateIdSet(targetSignal: typeof this.updatingIdsSignal, operation: 'add' | 'delete', id: string): void {
+    targetSignal.update((currentSet: Set<string>) => {
+      const newSet = new Set(currentSet);
+      operation === 'add' ? newSet.add(id) : newSet.delete(id);
+      return newSet;
+    });
+  }
+
   // Per-operation signals
   setCreating(value: boolean): void {
     this.isCreatingSignal.set(value);
   }
 
   startUpdating(id: string): void {
-    this.updatingIdsSignal.update((s) => {
-      const next = new Set(s);
-      next.add(id);
-      return next;
-    });
+    this.updateIdSet(this.updatingIdsSignal, 'add', id);
   }
 
   stopUpdating(id: string): void {
-    this.updatingIdsSignal.update((s) => {
-      const next = new Set(s);
-      next.delete(id);
-      return next;
-    });
+    this.updateIdSet(this.updatingIdsSignal, 'delete', id);
   }
 
   isUpdating(id: string): boolean {
@@ -109,19 +110,11 @@ export class NotesStateService {
   }
 
   startDeleting(id: string): void {
-    this.deletingIdsSignal.update((s) => {
-      const next = new Set(s);
-      next.add(id);
-      return next;
-    });
+    this.updateIdSet(this.deletingIdsSignal, 'add', id);
   }
 
   stopDeleting(id: string): void {
-    this.deletingIdsSignal.update((s) => {
-      const next = new Set(s);
-      next.delete(id);
-      return next;
-    });
+    this.updateIdSet(this.deletingIdsSignal, 'delete', id);
   }
 
   isDeleting(id: string): boolean {

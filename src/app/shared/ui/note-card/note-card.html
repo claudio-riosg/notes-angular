@@ -8,8 +8,8 @@
           (click)="onTogglePin($event)"
           type="button"
           [attr.aria-pressed]="note().isPinned"
-          [disabled]="notesService.isUpdating(note().id) || notesService.isDeleting(note().id)"
-          [attr.aria-busy]="notesService.isUpdating(note().id) || notesService.isDeleting(note().id)"
+          [disabled]="orchestrator.isUpdating(note().id) || orchestrator.isDeleting(note().id)"
+          [attr.aria-busy]="orchestrator.isUpdating(note().id) || orchestrator.isDeleting(note().id)"
           aria-label="Toggle pin">
           📌
         </button>
@@ -18,8 +18,8 @@
           (click)="onMenuClick($event)"
           type="button"
           aria-haspopup="menu"
-          [disabled]="notesService.isDeleting(note().id)"
-          [attr.aria-busy]="notesService.isDeleting(note().id)"
+          [disabled]="orchestrator.isDeleting(note().id)"
+          [attr.aria-busy]="orchestrator.isDeleting(note().id)"
           aria-label="Open note menu">
           ⋮
         </button>

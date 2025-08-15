@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectionStrategy, signal } from '@angular/core';
-import { NotesService } from '@core/services';
+import { NotesOrchestrator } from '@core/services';
 import { Note, CreateNoteRequest, UpdateNoteRequest } from '@core/models';
 import { NotesGrid } from '../components/notes-grid/notes-grid';
 import { SearchBar } from '@app/shared/ui/search-bar/search-bar';
@@ -15,7 +15,7 @@ import { NoteContextMenu } from '../components/note-context-menu/note-context-me
   styleUrl: './notes.css'
 })
 export class Notes {
-  notesService = inject(NotesService);
+  noteOrchestrator = inject(NotesOrchestrator);
 
   // Modal state
   private isModalOpen = signal(false);
@@ -40,7 +40,7 @@ export class Notes {
   }
 
   onTogglePin(noteId: string): void {
-    this.notesService.togglePinNote(noteId);
+    this.noteOrchestrator.togglePinNote(noteId);
   }
 
   onMenuClick(data: { event: Event; note: Note }): void {
@@ -54,46 +54,47 @@ export class Notes {
   }
 
   onTagClick(tag: string): void {
-    this.notesService.toggleTag(tag);
+    this.noteOrchestrator.toggleTag(tag);
   }
 
   onSearchChange(searchTerm: string): void {
-    this.notesService.setSearchTerm(searchTerm);
+    this.noteOrchestrator.setSearchTerm(searchTerm);
   }
 
   onSearchClear(): void {
-    this.notesService.setSearchTerm('');
+    this.noteOrchestrator.setSearchTerm('');
   }
 
   onTagToggle(tag: string): void {
-    this.notesService.toggleTag(tag);
+    this.noteOrchestrator.toggleTag(tag);
   }
 
   onClearTagFilters(): void {
-    this.notesService.setSelectedTags([]);
+    this.noteOrchestrator.setSelectedTags([]);
   }
 
   onTogglePinnedFilter(): void {
-    this.notesService.togglePinnedFilter();
+    this.noteOrchestrator.togglePinnedFilter();
   }
 
   onClearFilters(): void {
-    this.notesService.clearFilters();
+    this.noteOrchestrator.clearFilters();
   }
 
   onRetry(): void {
-    this.notesService.loadNotes();
+    // Signal-first: trigger reactive reload
+    this.noteOrchestrator.loadNotes();
   }
 
   getEmptyTitle(): string {
-    if (this.notesService.hasActiveFilters()) {
+    if (this.noteOrchestrator.hasActiveFilters()) {
       return 'No matching notes';
     }
     return 'No notes yet';
   }
 
   getEmptyMessage(): string {
-    if (this.notesService.hasActiveFilters()) {
+    if (this.noteOrchestrator.hasActiveFilters()) {
       return 'Try adjusting your search or filters to find what you\'re looking for.';
     }
     return 'Create your first note to get started organizing your thoughts and ideas.';
@@ -104,23 +105,15 @@ export class Notes {
     this.selectedNote.set(null);
   }
 
-  async onModalSubmit(request: CreateNoteRequest | UpdateNoteRequest): Promise<void> {
-    this._isSubmitting.set(true);
-    try {
-      if ('id' in request) {
-        const updated = await this.notesService.updateNote(request);
-        if (updated) {
-          this.onCloseModal();
-        }
-      } else {
-        const created = await this.notesService.createNote(request);
-        if (created) {
-          this.onCloseModal();
-        }
-      }
-    } finally {
-      this._isSubmitting.set(false);
+  onModalSubmit(request: CreateNoteRequest | UpdateNoteRequest): void {
+    // 🎯 Signal-first: solo triggers, sin async/await
+    if ('id' in request) {
+      this.noteOrchestrator.updateNote(request);
+    } else {
+      this.noteOrchestrator.createNote(request);
     }
+    // Modal se cierra inmediatamente, operación es reactiva
+    this.onCloseModal();
   }
 
   onEditFromMenu(note: Note): void {
@@ -129,12 +122,13 @@ export class Notes {
   }
 
   onDuplicateNote(note: Note): void {
-    this.notesService.duplicateNote(note.id);
+    this.noteOrchestrator.duplicateNote(note.id);
   }
 
   onDeleteNote(note: Note): void {
     if (confirm(`Are you sure you want to delete "${note.title}"?`)) {
-      this.notesService.deleteNote(note.id);
+      // 🎯 Signal-first: solo trigger
+      this.noteOrchestrator.deleteNote(note.id);
     }
   }
 
