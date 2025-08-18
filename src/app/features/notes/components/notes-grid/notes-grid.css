@@ -18,8 +18,9 @@
 
 .notes-grid__container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: var(--spacing-md);
+  align-items: start;
   width: 100%;
 }
 
@@ -56,12 +57,34 @@
   margin: 0 0 var(--spacing-xl) 0;
 }
 
+/* Tablet landscape and small desktop */
+@media (max-width: 1024px) {
+  .notes-grid__container {
+    grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+  }
+}
+
+/* Tablet portrait */
 @media (max-width: 768px) {
   .notes-grid__container {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: var(--spacing-lg);
   }
 
   .notes-section {
-    margin-bottom: 24px;
+    margin-bottom: var(--spacing-2xl);
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .notes-grid__container {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .notes-grid__empty {
+    padding: var(--spacing-2xl);
+    min-height: 300px;
   }
 }

@@ -2,7 +2,7 @@
     <!-- Pinned Notes Section -->
     @if (pinnedNotes().length > 0) {
       <section class="notes-section">
-          <h3 class="notes-section__title" aria-live="polite">📌 Pinned Notes</h3>
+          <h3 class="notes-section__title" aria-live="polite"><i class="lni lni-pin"></i> Pinned Notes</h3>
         <div class="notes-grid__container">
           @for (note of pinnedNotes(); track note.id) {
             <note-card
@@ -21,7 +21,7 @@
     @if (unpinnedNotes().length > 0) {
       <section class="notes-section">
         @if (pinnedNotes().length > 0) {
-          <h3 class="notes-section__title" aria-live="polite">📝 Notes</h3>
+          <h3 class="notes-section__title" aria-live="polite"><i class="lni lni-notepad"></i> Notes</h3>
         }
         <div class="notes-grid__container">
           @for (note of unpinnedNotes(); track note.id) {
@@ -41,7 +41,7 @@
     @if (pinnedNotes().length === 0 && unpinnedNotes().length === 0) {
       <div class="notes-grid__empty" role="status" aria-live="polite">
         <div class="notes-grid__empty-content">
-          <span class="notes-grid__empty-icon">📝</span>
+          <span class="notes-grid__empty-icon"><i class="lni lni-notepad"></i></span>
           <h3 class="notes-grid__empty-title">{{ emptyTitle() }}</h3>
           <p class="notes-grid__empty-message">{{ emptyMessage() }}</p>
           @if (showCreateButton()) {

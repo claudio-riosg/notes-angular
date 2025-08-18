@@ -4,14 +4,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--color-backgroundOverlay);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: 20px;
+  z-index: var(--zIndex-modal);
+  padding: var(--spacing-xl);
   backdrop-filter: blur(4px);
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn var(--animation-duration-normal) var(--animation-easing-out);
   overflow: auto;
 }
 
@@ -19,7 +19,7 @@
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
-  animation: slideUp 0.3s ease-out;
+  animation: slideUp var(--animation-duration-slow) var(--animation-easing-out);
 }
 
 @keyframes fadeIn {
@@ -34,7 +34,7 @@
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(var(--spacing-xl));
   }
   to {
     opacity: 1;

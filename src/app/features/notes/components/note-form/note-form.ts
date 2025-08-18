@@ -30,13 +30,35 @@ export class NoteForm {
   // Signals
   private _currentTag = signal('');
   private _showSuggestions = signal(false);
+  private _temporalTags = signal<string[]>([]);
+  private _removedTags = signal<Set<string>>(new Set());
 
   readonly currentTag = this._currentTag.asReadonly();
   readonly showSuggestions = this._showSuggestions.asReadonly();
+  readonly temporalTags = this._temporalTags.asReadonly();
+  readonly removedTags = this._removedTags.asReadonly();
 
   // Computed properties
   readonly isEditMode = computed(() => !!this.note());
   readonly currentTags = computed(() => this.noteForm.get('tags')?.value || []);
+  
+  // Computed temporal tags for display
+  readonly displayTags = computed(() => {
+    const formTags = this.currentTags();
+    const temporal = this.temporalTags();
+    const removed = this.removedTags();
+    
+    // In edit mode, show temporal tags, otherwise show form tags
+    if (this.isEditMode() && temporal.length > 0) {
+      return temporal.filter(tag => !removed.has(tag));
+    }
+    
+    return formTags.filter(tag => !removed.has(tag));
+  });
+  
+  readonly tagsToRemove = computed(() => {
+    return Array.from(this.removedTags());
+  });
 
   readonly filteredSuggestions = computed(() => {
     const currentTagValue = this.currentTag().toLowerCase().trim();
@@ -85,6 +107,9 @@ export class NoteForm {
           color: note.color,
           isPinned: note.isPinned
         });
+        // Initialize temporal state with original tags
+        this._temporalTags.set([...note.tags]);
+        this._removedTags.set(new Set());
       } else {
         this.noteForm.reset({
           title: '',
@@ -93,6 +118,9 @@ export class NoteForm {
           color: 'yellow' as NoteColor,
           isPinned: false
         });
+        // Reset temporal state
+        this._temporalTags.set([]);
+        this._removedTags.set(new Set());
       }
     });
   }
@@ -197,12 +225,31 @@ export class NoteForm {
 
   addTag(tag: string): void {
     const normalizedTag = tag.trim().toLowerCase();
-    const currentTags = this.noteForm.get('tags')?.value || [];
-
-    if (normalizedTag && !currentTags.includes(normalizedTag)) {
-      this.noteForm.patchValue({
-        tags: [...currentTags, normalizedTag]
-      });
+    
+    if (this.isEditMode()) {
+      // In edit mode, update temporal tags
+      const temporal = this.temporalTags();
+      const removed = new Set(this.removedTags());
+      
+      if (normalizedTag && !temporal.includes(normalizedTag)) {
+        // Add to temporal tags
+        this._temporalTags.set([...temporal, normalizedTag]);
+        // Remove from removed set if it was there
+        removed.delete(normalizedTag);
+        this._removedTags.set(removed);
+        // Update form for final submission
+        this.noteForm.patchValue({
+          tags: [...temporal, normalizedTag]
+        });
+      }
+    } else {
+      // In create mode, update form directly
+      const currentTags = this.noteForm.get('tags')?.value || [];
+      if (normalizedTag && !currentTags.includes(normalizedTag)) {
+        this.noteForm.patchValue({
+          tags: [...currentTags, normalizedTag]
+        });
+      }
     }
 
     this._currentTag.set('');
@@ -210,10 +257,25 @@ export class NoteForm {
   }
 
   removeTag(tag: string): void {
-    const currentTags = this.noteForm.get('tags')?.value || [];
-    this.noteForm.patchValue({
-      tags: currentTags.filter((t: string) => t !== tag)
-    });
+    if (this.isEditMode()) {
+      // In edit mode, mark as removed temporarily
+      const removed = new Set(this.removedTags());
+      removed.add(tag);
+      this._removedTags.set(removed);
+      
+      // Update form for final submission (remove from temporal tags)
+      const temporal = this.temporalTags().filter(t => t !== tag);
+      this._temporalTags.set(temporal);
+      this.noteForm.patchValue({
+        tags: temporal
+      });
+    } else {
+      // In create mode, remove from form directly
+      const currentTags = this.noteForm.get('tags')?.value || [];
+      this.noteForm.patchValue({
+        tags: currentTags.filter((t: string) => t !== tag)
+      });
+    }
   }
 
   getColorName(color: NoteColor): string {

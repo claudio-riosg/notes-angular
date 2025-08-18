@@ -1,64 +1,64 @@
     .tag-filter {
-      background: #f9fafb;
-      border-radius: 8px;
-      padding: 16px;
-      border: 1px solid #e5e7eb;
+      background: var(--color-backgroundSecondary);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      border: 1px solid var(--color-border);
     }
 
     .tag-filter__title {
-      margin: 0 0 12px 0;
-      font-size: 14px;
-      font-weight: 600;
-      color: #374151;
+      margin: 0 0 var(--spacing-md) 0;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
     }
 
     .tag-filter__tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-md);
     }
 
     .tag-filter__tag {
-      background: #ffffff;
-      border: 1px solid #d1d5db;
-      color: #4b5563;
-      padding: 6px 12px;
-      border-radius: 16px;
-      font-size: 12px;
-      font-weight: 500;
+      background: var(--color-background);
+      border: 1px solid var(--color-border);
+      color: var(--color-textMuted);
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: var(--spacing-lg);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all var(--animation-duration-normal) var(--animation-easing-out);
     }
 
     .tag-filter__tag:hover {
-      border-color: #9ca3af;
-      background: #f3f4f6;
+      border-color: var(--color-textDisabled);
+      background: var(--color-backgroundMuted);
     }
 
     .tag-filter__tag--active {
-      background: #3b82f6;
-      border-color: #3b82f6;
-      color: #ffffff;
+      background: var(--color-info);
+      border-color: var(--color-info);
+      color: var(--color-textInverse);
     }
 
     .tag-filter__tag--active:hover {
-      background: #2563eb;
-      border-color: #2563eb;
+      background: var(--color-infoHover);
+      border-color: var(--color-infoHover);
     }
 
     .tag-filter__clear {
       background: none;
       border: none;
-      color: #ef4444;
-      font-size: 12px;
-      font-weight: 500;
+      color: var(--color-danger);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
       text-decoration: underline;
       padding: 0;
     }
 
     .tag-filter__clear:hover {
-      color: #dc2626;
+      color: var(--color-dangerHover);
     }
   

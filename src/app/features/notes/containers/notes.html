@@ -9,7 +9,7 @@
           (click)="onCreateNote()"
           [disabled]="noteOrchestrator.isCreating()"
           [attr.aria-busy]="noteOrchestrator.isCreating()">
-          ✏️ New Note
+          <i class="lni lni-pencil"></i> New Note
         </button>
       </div>
     </div>
@@ -26,7 +26,7 @@
           type="button"
           [class]="'btn btn--sm ' + (noteOrchestrator.filter().showPinnedOnly ? 'btn--primary' : 'btn--secondary')"
           (click)="onTogglePinnedFilter()">
-          📌 Pinned Only
+          <i class="lni lni-pin"></i> Pinned Only
         </button>
         
         @if (noteOrchestrator.hasActiveFilters()) {

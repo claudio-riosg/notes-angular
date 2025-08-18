@@ -21,7 +21,7 @@
           [class.note-form__pin-btn--active]="noteForm.get('isPinned')?.value"
           (click)="togglePin()"
           title="Pin note">
-          📌
+          <i class="lni lni-pin"></i>
         </button>
       }
 
@@ -30,7 +30,7 @@
         class="note-form__close"
         (click)="onCancel()"
         title="Close">
-        ✕
+        <i class="lni lni-close"></i>
       </button>
     </div>
   </div>
@@ -87,17 +87,18 @@
           #tagInput>
       </div>
       
-      @if (currentTags().length > 0) {
+      @if (displayTags().length > 0) {
         <div class="note-form__tag-list">
-          @for (tag of currentTags(); track tag) {
-            <span class="note-form__tag">
+          @for (tag of displayTags(); track tag) {
+            <span class="note-form__tag" 
+                  [class.note-form__tag--removing]="removedTags().has(tag)">
               #{{ tag }}
               <button
                 type="button"
                 class="note-form__tag-remove"
                 (click)="removeTag(tag)"
                 title="Remove tag">
-                ✕
+                <i class="lni lni-close"></i>
               </button>
             </span>
           }

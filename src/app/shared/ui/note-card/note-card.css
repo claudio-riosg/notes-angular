@@ -1,10 +1,9 @@
 .note-card {
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   cursor: pointer;
   transition: all var(--animation-duration-normal) var(--animation-easing-out);
-  border: 2px solid transparent;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
   position: relative;
   min-height: 120px;
   display: flex;
@@ -12,8 +11,9 @@
 }
 
 .note-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-border);
 }
 
 .note-card--pinned::before {
@@ -79,19 +79,20 @@
 
 .note-card__content {
   flex: 1;
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-md);
 }
 
 .note-card__content p {
   margin: 0;
   color: var(--color-textMuted);
   font-size: var(--font-size-sm);
-  line-height: var(--line-height-relaxed);
+  line-height: var(--line-height-normal);
   display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .note-card__footer {
@@ -104,29 +105,30 @@
 .note-card__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: var(--spacing-xs);
   flex: 1;
 }
 
 .note-card__tag {
   background: var(--color-backgroundMuted);
-  color: var(--color-text);
-  padding: 6px 12px;
-  border-radius: 12px;
-  border: 1px solid #d1d5db;
-  font-size: 11px;
-  font-weight: 500;
+  color: var(--color-textMuted);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-xl);
+  border: none;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all var(--animation-duration-normal) var(--animation-easing-out);
 }
 
 .note-card__tag:hover {
-  background: var(--color-borderMuted);
+  background: var(--color-primaryLight);
+  color: var(--color-primaryDark);
 }
 
 .note-card__date {
   color: var(--color-textDisabled);
   font-size: var(--font-size-xs);
   white-space: nowrap;
-  margin-left: 8px;
+  margin-left: var(--spacing-sm);
 }

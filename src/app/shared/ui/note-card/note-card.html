@@ -11,7 +11,7 @@
           [disabled]="orchestrator.isUpdating(note().id) || orchestrator.isDeleting(note().id)"
           [attr.aria-busy]="orchestrator.isUpdating(note().id) || orchestrator.isDeleting(note().id)"
           aria-label="Toggle pin">
-          📌
+          <i class="lni lni-pin"></i>
         </button>
         <button 
           class="note-card__menu-btn"
@@ -21,7 +21,7 @@
           [disabled]="orchestrator.isDeleting(note().id)"
           [attr.aria-busy]="orchestrator.isDeleting(note().id)"
           aria-label="Open note menu">
-          ⋮
+          <i class="lni lni-menu"></i>
         </button>
       </div>
     </header>
