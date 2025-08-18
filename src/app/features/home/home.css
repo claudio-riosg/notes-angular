@@ -45,7 +45,7 @@
 .features__title {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
-  color: var(--color-text);
+  color: var(--color-primaryHover);
   margin: 0 0 var(--spacing-5xl) 0;
 }
 
@@ -73,12 +73,13 @@
 .feature-card__icon {
   font-size: var(--font-size-4xl);
   margin-bottom: var(--spacing-lg);
+  color: var(--color-secondaryLight);
 }
 
 .feature-card__title {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
+  color: var(--color-infoHover);
   margin: 0 0 var(--spacing-md) 0;
 }
 

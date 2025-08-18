@@ -8,7 +8,7 @@ import { RouterOutlet, RouterModule } from '@angular/router';
     <nav class="app-nav">
       <div class="app-nav__container">
         <a routerLink="/" class="app-nav__brand">
-          📝 Notes App
+          <i class="lni lni-notepad"></i> Notes App
         </a>
         <div class="app-nav__links">
           <a routerLink="/" routerLinkActive="app-nav__link--active" [routerLinkActiveOptions]="{exact: true}" class="app-nav__link">

@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
   template: `
     <div class="search-bar">
       <div class="search-bar__input-container">
-        <span class="search-bar__icon">🔍</span>
+        <span class="search-bar__icon"><i class="lni lni-search"></i></span>
         <input 
           type="text"
           class="search-bar__input"
@@ -23,7 +23,7 @@ import { FormsModule } from '@angular/forms';
             class="search-bar__clear"
             (click)="onClear()"
             type="button">
-            ✕
+            <i class="lni lni-close"></i>
           </button>
         }
       </div>

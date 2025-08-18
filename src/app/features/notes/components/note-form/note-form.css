@@ -59,24 +59,24 @@
   background: var(--color-dangerLight);
   border-left: 4px solid var(--color-danger);
   color: var(--color-dangerDark);
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   font-weight: 500;
 }
 
 .note-form__actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 .note-form__pin-btn,
 .note-form__close {
   background: none;
   border: none;
-  padding: 8px;
-  border-radius: 6px;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  color: #6b7280;
+  color: var(--color-textMuted);
   font-size: 16px;
   transition: all 0.2s ease;
   display: flex;
@@ -86,18 +86,18 @@
 
 .note-form__pin-btn:hover,
 .note-form__close:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--color-backgroundMuted);
+  color: var(--color-text);
 }
 
 .note-form__pin-btn--active {
-  color: #f59e0b;
+  color: var(--color-warning);
   transform: rotate(45deg);
 }
 
 .note-form__content {
   flex: 1;
-  padding: 0 24px;
+  padding: 0 var(--spacing-2xl);
   overflow: auto;
   display: flex;
   flex-direction: column;
@@ -225,7 +225,7 @@
   color: var(--color-text);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: 14px;
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   display: flex;
   align-items: center;
@@ -243,7 +243,7 @@
   border: none;
   color: var(--color-textMuted);
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   padding: 0;
   width: 14px;
   height: 14px;
@@ -255,8 +255,28 @@
 }
 
 .note-form__tag-remove:hover {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger);
+  background: var(--color-dangerLight);
+}
+
+/* Tag removal animation and visual feedback */
+.note-form__tag--removing {
+  opacity: 0.6;
+  background: var(--color-dangerLight);
+  border-color: var(--color-danger);
+  text-decoration: line-through;
+  transform: scale(0.95);
+  transition: all var(--animation-duration-normal) var(--animation-easing-out);
+}
+
+.note-form__tag--removing .note-form__tag-remove {
+  color: var(--color-danger);
+  background: var(--color-danger);
+  opacity: 0.8;
+}
+
+.note-form__tag--removing .note-form__tag-remove:hover {
+  background: var(--color-dangerDark);
 }
 
 .note-form__suggestions {
@@ -264,10 +284,10 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: #ffffff;
-  border: 2px solid #e5e7eb;
-  border-radius: 6px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
   z-index: 10;
   max-height: 140px;
   overflow-y: auto;
