@@ -15,6 +15,7 @@ import { NoteForm } from '../note-form/note-form';
           <note-form
             [note]="note()"
             [availableTags]="availableTags()"
+            [allNotes]="allNotes()"
             [isSubmitting]="submitting"
             (submit)="onSubmit($event)"
             (cancel)="onCancel()">
@@ -31,6 +32,7 @@ export class NoteModal {
   isOpen = input.required<boolean>();
   note = input<Note | null>(null);
   availableTags = input<string[]>([]);
+  allNotes = input<Note[]>([]);
   isSubmitting = input(false);
 
   // Outputs

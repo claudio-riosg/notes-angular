@@ -1,4 +1,4 @@
-import { Component, inject, input, output, ChangeDetectionStrategy, signal, computed, effect } from '@angular/core';
+import { Component, inject, input, output, ChangeDetectionStrategy, signal, computed, effect, linkedSignal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Note, CreateNoteRequest, UpdateNoteRequest, NoteColor } from '@core/models';
 
@@ -21,6 +21,7 @@ export class NoteForm {
   // Inputs
   note = input<Note | null>(null);
   availableTags = input<string[]>([]);
+  allNotes = input<Note[]>([]); // Para smart default color
   isSubmitting = input(false);
 
   // Outputs
@@ -32,11 +33,35 @@ export class NoteForm {
   private _showSuggestions = signal(false);
   private _temporalTags = signal<string[]>([]);
   private _removedTags = signal<Set<string>>(new Set());
+  private _userHasManuallySelectedColor = signal(false); // Para linkedSignal
 
   readonly currentTag = this._currentTag.asReadonly();
   readonly showSuggestions = this._showSuggestions.asReadonly();
   readonly temporalTags = this._temporalTags.asReadonly();
   readonly removedTags = this._removedTags.asReadonly();
+
+  //  LinkedSignal: Smart default color based on user preferences
+  private smartDefaultColor = linkedSignal<Note[], NoteColor>({
+    source: () => this.allNotes(),
+    computation: (notes: Note[], previous?: { source: Note[]; value: NoteColor }) => {
+     
+      if (notes.length === 0) return 'yellow';
+      
+      if (this._userHasManuallySelectedColor() && previous?.value) {
+        return previous.value;
+      }
+
+      const colorCounts = notes.reduce((acc, note) => {
+        acc[note.color] = (acc[note.color] || 0) + 1;
+        return acc;
+      }, {} as Record<NoteColor, number>);
+      
+      const mostUsedColor = Object.entries(colorCounts)
+        .sort(([,a], [,b]) => b - a)[0]?.[0] as NoteColor;
+      
+      return mostUsedColor || 'yellow';
+    }
+  });
 
   // Computed properties
   readonly isEditMode = computed(() => !!this.note());
@@ -110,17 +135,21 @@ export class NoteForm {
         // Initialize temporal state with original tags
         this._temporalTags.set([...note.tags]);
         this._removedTags.set(new Set());
+        this._userHasManuallySelectedColor.set(false); // Reset manual selection flag
       } else {
+        // En modo crear, usar smart default color
+        const smartColor = this.smartDefaultColor();
         this.noteForm.reset({
           title: '',
           content: '',
           tags: [],
-          color: 'yellow' as NoteColor,
+          color: smartColor,
           isPinned: false
         });
         // Reset temporal state
         this._temporalTags.set([]);
         this._removedTags.set(new Set());
+        this._userHasManuallySelectedColor.set(false); // Reset manual selection flag
       }
     });
   }
@@ -194,6 +223,11 @@ export class NoteForm {
 
   setColor(color: NoteColor): void {
     this.noteForm.patchValue({ color });
+    // 🎯 Override smart default color con selección manual del usuario
+    if (!this.isEditMode()) {
+      this._userHasManuallySelectedColor.set(true);
+      this.smartDefaultColor.set(color);
+    }
   }
 
   togglePin(): void {

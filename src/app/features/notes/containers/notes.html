@@ -123,6 +123,7 @@
     [isOpen]="modalOpen()"
     [note]="noteForEdit()"
     [availableTags]="noteOrchestrator.allTags()"
+    [allNotes]="noteOrchestrator.notes()"
     [isSubmitting]="isSubmitting()"
     (close)="onCloseModal()"
     (submit)="onModalSubmit($event)">

@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, linkedSignal } from '@angular/core';
 import { Note, NotesFilter, NoteColor } from '@core/models';
 
 @Injectable({
@@ -6,13 +6,12 @@ import { Note, NotesFilter, NoteColor } from '@core/models';
 })
 export class NotesStateStore {
   private notesSignal = signal<Note[]>([]);
-  private selectedNoteSignal = signal<Note | null>(null);
   private isLoadingSignal = signal(false);
   private errorSignal = signal<string | null>(null);
   private isCreatingSignal = signal(false);
   private updatingIdsSignal = signal<Set<string>>(new Set());
   private deletingIdsSignal = signal<Set<string>>(new Set());
-  
+
   private filterSignal = signal<NotesFilter>({
     searchTerm: '',
     selectedTags: [],
@@ -20,9 +19,23 @@ export class NotesStateStore {
     showPinnedOnly: false
   });
 
+  // SelectedNote with auto-reset behavior
+  private selectedNoteLinked = linkedSignal<Note[], Note | null>({
+    source: () => this.notesSignal(),
+    computation: (notes: Note[], previous?: { source: Note[]; value: Note | null }) => {
+      // No notes =>  null
+      if (!previous?.value) return null;
+
+      // Verify if the selected note still exists in the current notes
+      const selectedNote = previous.value;
+      const stillExists = notes.find((n: Note) => n.id === selectedNote.id);
+      return stillExists ? selectedNote : null;
+    }
+  });
+
   // Read-only computed signals
   readonly notes = this.notesSignal.asReadonly();
-  readonly selectedNote = this.selectedNoteSignal.asReadonly();
+  readonly selectedNote = this.selectedNoteLinked.asReadonly();
   readonly isLoading = this.isLoadingSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
   readonly filter = this.filterSignal.asReadonly();
@@ -65,14 +78,11 @@ export class NotesStateStore {
 
   deleteNote(noteId: string): void {
     this.notesSignal.update(notes => notes.filter(note => note.id !== noteId));
-    // Clear selected note if it was deleted
-    if (this.selectedNote()?.id === noteId) {
-      this.selectedNoteSignal.set(null);
-    }
+    // 🎯 LinkedSignal auto-handles selectedNote cleanup when note is deleted
   }
 
   setSelectedNote(note: Note | null): void {
-    this.selectedNoteSignal.set(note);
+    this.selectedNoteLinked.set(note);
   }
 
   setLoading(loading: boolean): void {
