@@ -1,6 +1,9 @@
 import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
+/**
+ * Search input component with clear functionality and accessibility features
+ */
 @Component({
   selector: 'search-bar',
   imports: [FormsModule],
@@ -38,11 +41,17 @@ export class SearchBar {
   readonly searchChange = output<string>();
   readonly clear = output<void>();
 
+  /**
+   * Handles search input changes
+   */
   onSearchChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.searchChange.emit(target.value);
   }
 
+  /**
+   * Clears the search input
+   */
   onClear(): void {
     this.clear.emit();
   }

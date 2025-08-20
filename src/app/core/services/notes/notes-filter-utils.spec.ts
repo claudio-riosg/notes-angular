@@ -1,12 +1,12 @@
-import { NotesFilterService } from './notes-filter';
+import { NotesFilterUtils } from './notes-filter-utils';
 import { Note, NotesFilter } from '../../../core/models';
 
-describe('NotesFilterService', () => {
-  let service: NotesFilterService;
+describe('NotesFilterUtils', () => {
+  let service: NotesFilterUtils;
   let baseNotes: Note[];
 
   beforeEach(() => {
-    service = new NotesFilterService();
+    service = new NotesFilterUtils();
 
     const now = new Date('2025-01-10T10:00:00');
     baseNotes = [

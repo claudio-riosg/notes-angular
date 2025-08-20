@@ -1,9 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { Notes } from './notes';
-import { NotesService } from '@core/services';
+import { NotesOrchestrator } from '@core/services';
 
-class NotesServiceMock {
+class NotesOrchestratorMock {
   // Signal-based mocks that return values like real signals
   notes = signal([]);
   pinnedNotes = signal([]);
@@ -39,7 +41,11 @@ describe('Notes container', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Notes],
-      providers: [{ provide: NotesService, useClass: NotesServiceMock }],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: NotesOrchestrator, useClass: NotesOrchestratorMock }
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Notes);
@@ -52,7 +58,7 @@ describe('Notes container', () => {
   });
 
   it('getEmptyTitle should reflect active filters', () => {
-    const svc = TestBed.inject(NotesService) as unknown as NotesServiceMock;
+    const svc = TestBed.inject(NotesOrchestrator) as unknown as NotesOrchestratorMock;
     svc.hasActiveFilters.set(true);
     expect(component.getEmptyTitle()).toBe('No matching notes');
   });

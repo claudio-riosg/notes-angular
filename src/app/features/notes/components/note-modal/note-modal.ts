@@ -2,6 +2,9 @@ import { Component, input, output, ChangeDetectionStrategy, effect } from '@angu
 import { Note, CreateNoteRequest, UpdateNoteRequest } from '@core/models';
 import { NoteForm } from '../note-form/note-form';
 
+/**
+ * Modal component for note creation and editing with backdrop and escape key handling
+ */
 @Component({
   selector: 'note-modal',
   imports: [NoteForm],
@@ -15,6 +18,7 @@ import { NoteForm } from '../note-form/note-form';
           <note-form
             [note]="note()"
             [availableTags]="availableTags()"
+            [allNotes]="allNotes()"
             [isSubmitting]="submitting"
             (submit)="onSubmit($event)"
             (cancel)="onCancel()">
@@ -27,13 +31,12 @@ import { NoteForm } from '../note-form/note-form';
  
 })
 export class NoteModal {
-  // Inputs
   isOpen = input.required<boolean>();
   note = input<Note | null>(null);
   availableTags = input<string[]>([]);
+  allNotes = input<Note[]>([]);
   isSubmitting = input(false);
 
-  // Outputs
   close = output<void>();
   submit = output<CreateNoteRequest | UpdateNoteRequest>();
 
@@ -66,14 +69,23 @@ export class NoteModal {
     });
   }
 
+  /**
+   * Handles form submission for note creation or update
+   */
   async onSubmit(request: CreateNoteRequest | UpdateNoteRequest): Promise<void> {
     this.submit.emit(request);
   }
 
+  /**
+   * Handles modal cancellation
+   */
   onCancel(): void {
     this.close.emit();
   }
 
+  /**
+   * Handles backdrop clicks to close modal
+   */
   onBackdropClick(event: MouseEvent): void {
     if (event.target === event.currentTarget) {
       this.onCancel();

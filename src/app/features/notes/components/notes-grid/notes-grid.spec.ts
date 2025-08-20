@@ -1,15 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { NotesGrid } from './notes-grid';
 import { Note } from '@core/models';
-import { provideHttpClient } from '@angular/common/http';
-import { NotesService } from '@core/services';
-import { NotesApiClient } from '@core/services/notes/notes-api-client';
+import { NotesOrchestrator } from '@core/services';
 
-class NotesApiClientMock {
-  getNotes = jest.fn();
-  createNote = jest.fn();
-  updateNote = jest.fn();
-  deleteNote = jest.fn();
+class NotesOrchestratorMock {
+  isUpdating = jest.fn(() => false);
+  isDeleting = jest.fn(() => false);
 }
 
 describe('NotesGrid', () => {
@@ -24,8 +22,8 @@ describe('NotesGrid', () => {
       imports: [NotesGrid],
       providers: [
         provideHttpClient(),
-        NotesService,
-        { provide: NotesApiClient, useClass: NotesApiClientMock },
+        provideHttpClientTesting(),
+        { provide: NotesOrchestrator, useClass: NotesOrchestratorMock },
       ],
     }).compileComponents();
 

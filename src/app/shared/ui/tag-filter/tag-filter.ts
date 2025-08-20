@@ -1,5 +1,8 @@
 import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 
+/**
+ * Tag filter component with toggle and clear functionality
+ */
 @Component({
   selector: 'tag-filter',
   imports: [],
@@ -38,10 +41,16 @@ export class TagFilter {
   readonly tagToggle = output<string>();
   readonly clearTags = output<void>();
 
+  /**
+   * Handles tag selection toggle
+   */
   onTagToggle(tag: string): void {
     this.tagToggle.emit(tag);
   }
 
+  /**
+   * Clears all selected tags
+   */
   onClearTags(): void {
     this.clearTags.emit();
   }

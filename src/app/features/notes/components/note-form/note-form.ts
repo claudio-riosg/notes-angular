@@ -1,7 +1,10 @@
-import { Component, inject, input, output, ChangeDetectionStrategy, signal, computed, effect } from '@angular/core';
+import { Component, inject, input, output, ChangeDetectionStrategy, signal, computed, effect, linkedSignal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Note, CreateNoteRequest, UpdateNoteRequest, NoteColor } from '@core/models';
 
+/**
+ * Form component for creating and editing notes with validation and smart features
+ */
 @Component({
   selector: 'note-form',
   imports: [ReactiveFormsModule],
@@ -18,31 +21,51 @@ import { Note, CreateNoteRequest, UpdateNoteRequest, NoteColor } from '@core/mod
 export class NoteForm {
   private fb = inject(FormBuilder);
 
-  // Inputs
   note = input<Note | null>(null);
   availableTags = input<string[]>([]);
+  allNotes = input<Note[]>([]);
   isSubmitting = input(false);
 
-  // Outputs
   submit = output<CreateNoteRequest | UpdateNoteRequest>();
   cancel = output<void>();
-
-  // Signals
   private _currentTag = signal('');
   private _showSuggestions = signal(false);
   private _temporalTags = signal<string[]>([]);
   private _removedTags = signal<Set<string>>(new Set());
+  private _userHasManuallySelectedColor = signal(false);
 
   readonly currentTag = this._currentTag.asReadonly();
   readonly showSuggestions = this._showSuggestions.asReadonly();
   readonly temporalTags = this._temporalTags.asReadonly();
   readonly removedTags = this._removedTags.asReadonly();
 
-  // Computed properties
+  /**
+   * Smart default color based on most frequently used color in existing notes
+   */
+  private smartDefaultColor = linkedSignal<Note[], NoteColor>({
+    source: () => this.allNotes(),
+    computation: (notes: Note[], previous?: { source: Note[]; value: NoteColor }) => {
+     
+      if (notes.length === 0) return 'yellow';
+      
+      if (this._userHasManuallySelectedColor() && previous?.value) {
+        return previous.value;
+      }
+
+      const colorCounts = notes.reduce((acc, note) => {
+        acc[note.color] = (acc[note.color] || 0) + 1;
+        return acc;
+      }, {} as Record<NoteColor, number>);
+      
+      const mostUsedColor = Object.entries(colorCounts)
+        .sort(([,a], [,b]) => b - a)[0]?.[0] as NoteColor;
+      
+      return mostUsedColor || 'yellow';
+    }
+  });
+
   readonly isEditMode = computed(() => !!this.note());
   readonly currentTags = computed(() => this.noteForm.get('tags')?.value || []);
-  
-  // Computed temporal tags for display
   readonly displayTags = computed(() => {
     const formTags = this.currentTags();
     const temporal = this.temporalTags();
@@ -74,7 +97,6 @@ export class NoteForm {
       .slice(0, 6);
   });
 
-  // Available colors
   readonly availableColors: NoteColor[] = [
     'yellow',
     'blue',
@@ -86,7 +108,6 @@ export class NoteForm {
     'red'
   ];
 
-  // Reactive Form
   noteForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(200)]],
     content: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(10000)]],
@@ -96,7 +117,6 @@ export class NoteForm {
   });
 
   constructor() {
-    // Initialize form when note changes
     effect(() => {
       const note = this.note();
       if (note) {
@@ -107,24 +127,28 @@ export class NoteForm {
           color: note.color,
           isPinned: note.isPinned
         });
-        // Initialize temporal state with original tags
         this._temporalTags.set([...note.tags]);
         this._removedTags.set(new Set());
+        this._userHasManuallySelectedColor.set(false);
       } else {
+        const smartColor = this.smartDefaultColor();
+        const currentColor = this.noteForm.get('color')?.value;
         this.noteForm.reset({
           title: '',
           content: '',
           tags: [],
-          color: 'yellow' as NoteColor,
+          color: this._userHasManuallySelectedColor() ? currentColor : smartColor,
           isPinned: false
         });
-        // Reset temporal state
         this._temporalTags.set([]);
         this._removedTags.set(new Set());
       }
     });
   }
 
+  /**
+   * Gets CSS border color based on selected note color
+   */
   getBorderColor(): string {
     const color = this.noteForm.get('color')?.value as NoteColor | null;
     switch (color) {
@@ -140,6 +164,9 @@ export class NoteForm {
     }
   }
 
+  /**
+   * Handles form submission for creating or updating notes
+   */
   onSubmit(event?: Event): void {
     if (event) {
       event.preventDefault();
@@ -184,6 +211,9 @@ export class NoteForm {
     }
   }
 
+  /**
+   * Handles form cancellation
+   */
   onCancel(event?: Event): void {
     if (event) {
       event.preventDefault();
@@ -192,21 +222,38 @@ export class NoteForm {
     this.cancel.emit();
   }
 
+  /**
+   * Sets the color for the note form.
+   * In create mode, marks that user has manually selected a color to preserve their choice.
+   * @param color - The color to set
+   */
   setColor(color: NoteColor): void {
     this.noteForm.patchValue({ color });
+    if (!this.isEditMode()) {
+      this._userHasManuallySelectedColor.set(true);
+    }
   }
 
+  /**
+   * Toggles pin status of the note
+   */
   togglePin(): void {
     const currentValue = this.noteForm.get('isPinned')?.value;
     this.noteForm.patchValue({ isPinned: !currentValue });
   }
 
+  /**
+   * Handles tag input changes and shows suggestions
+   */
   onTagInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     this._currentTag.set(input.value);
     this._showSuggestions.set(!!input.value.trim());
   }
 
+  /**
+   * Handles keyboard navigation for tag input
+   */
   onTagKeydown(event: KeyboardEvent): void {
     const input = event.target as HTMLInputElement;
     const tagValue = input.value.trim();
@@ -223,6 +270,9 @@ export class NoteForm {
     }
   }
 
+  /**
+   * Adds a tag to the current note
+   */
   addTag(tag: string): void {
     const normalizedTag = tag.trim().toLowerCase();
     
@@ -256,6 +306,9 @@ export class NoteForm {
     this._showSuggestions.set(false);
   }
 
+  /**
+   * Removes a tag from the current note
+   */
   removeTag(tag: string): void {
     if (this.isEditMode()) {
       // In edit mode, mark as removed temporarily
@@ -278,10 +331,16 @@ export class NoteForm {
     }
   }
 
+  /**
+   * Gets display name for note color
+   */
   getColorName(color: NoteColor): string {
     return color;
   }
 
+  /**
+   * Gets validation error message for form field
+   */
   getFieldError(fieldName: string): string | null {
     const field = this.noteForm.get(fieldName);
 
