@@ -1,21 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { Note, CreateNoteRequest, UpdateNoteRequest, NotesFilter } from '@core/models';
+import { Note, CreateNoteRequest, UpdateNoteRequest, NotesFilter, NoteDto } from '@core/models';
 
-/**
- * Data transfer object for note API responses
- */
-interface NoteDto {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  tags: string[];
-  color: Note['color'];
-  isPinned: boolean;
-}
 
 /**
  * HTTP client service for notes API operations
