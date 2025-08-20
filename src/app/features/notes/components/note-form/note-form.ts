@@ -40,7 +40,11 @@ export class NoteForm {
   readonly temporalTags = this._temporalTags.asReadonly();
   readonly removedTags = this._removedTags.asReadonly();
 
-  //  LinkedSignal: Smart default color based on user preferences
+  /**
+   * LinkedSignal for smart default color based on user preferences and existing notes.
+   * Computes the most frequently used color from existing notes as default.
+   * Preserves user manual color selection when specified.
+   */
   private smartDefaultColor = linkedSignal<Note[], NoteColor>({
     source: () => this.allNotes(),
     computation: (notes: Note[], previous?: { source: Note[]; value: NoteColor }) => {
@@ -121,7 +125,6 @@ export class NoteForm {
   });
 
   constructor() {
-    // Initialize form when note changes
     effect(() => {
       const note = this.note();
       if (note) {
@@ -132,24 +135,21 @@ export class NoteForm {
           color: note.color,
           isPinned: note.isPinned
         });
-        // Initialize temporal state with original tags
         this._temporalTags.set([...note.tags]);
         this._removedTags.set(new Set());
-        this._userHasManuallySelectedColor.set(false); // Reset manual selection flag
+        this._userHasManuallySelectedColor.set(false);
       } else {
-        // En modo crear, usar smart default color
         const smartColor = this.smartDefaultColor();
+        const currentColor = this.noteForm.get('color')?.value;
         this.noteForm.reset({
           title: '',
           content: '',
           tags: [],
-          color: smartColor,
+          color: this._userHasManuallySelectedColor() ? currentColor : smartColor,
           isPinned: false
         });
-        // Reset temporal state
         this._temporalTags.set([]);
         this._removedTags.set(new Set());
-        this._userHasManuallySelectedColor.set(false); // Reset manual selection flag
       }
     });
   }
@@ -221,12 +221,15 @@ export class NoteForm {
     this.cancel.emit();
   }
 
+  /**
+   * Sets the color for the note form.
+   * In create mode, marks that user has manually selected a color to preserve their choice.
+   * @param color - The color to set
+   */
   setColor(color: NoteColor): void {
     this.noteForm.patchValue({ color });
-    // 🎯 Override smart default color con selección manual del usuario
     if (!this.isEditMode()) {
       this._userHasManuallySelectedColor.set(true);
-      this.smartDefaultColor.set(color);
     }
   }
 

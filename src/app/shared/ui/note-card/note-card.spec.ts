@@ -1,14 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NoteCard } from './note-card';
 import { provideHttpClient } from '@angular/common/http';
-import { NotesService } from '@core/services';
-import { NotesApiClient } from '@core/services/notes/notes-api-client';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { NoteCard } from './note-card';
+import { NotesOrchestrator } from '@core/services';
 
-class NotesApiClientMock {
-  getNotes = jest.fn();
-  createNote = jest.fn();
-  updateNote = jest.fn();
-  deleteNote = jest.fn();
+class NotesOrchestratorMock {
+  isUpdating = jest.fn(() => false);
+  isDeleting = jest.fn(() => false);
 }
 import { Note } from '@core/models';
 
@@ -25,8 +23,8 @@ describe('NoteCard', () => {
       imports: [NoteCard],
       providers: [
         provideHttpClient(),
-        NotesService,
-        { provide: NotesApiClient, useClass: NotesApiClientMock },
+        provideHttpClientTesting(),
+        { provide: NotesOrchestrator, useClass: NotesOrchestratorMock },
       ],
     }).compileComponents();
 
