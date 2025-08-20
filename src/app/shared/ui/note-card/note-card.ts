@@ -3,6 +3,9 @@ import { Note, NoteColor } from '@core/models';
 import { inject } from '@angular/core';
 import { NotesOrchestrator } from '@core/services';
 
+/**
+ * Reusable note card component displaying note information with interactive features
+ */
 @Component({
   selector: 'note-card',
   imports: [],
@@ -26,7 +29,10 @@ export class NoteCard {
   readonly menuClick = output<{ event: Event; note: Note }>();
   readonly tagClick = output<string>();
 
-  // Computed properties for host bindings
+  /**
+   * Computes CSS classes based on note state
+   * @returns Space-separated CSS class string
+   */
   computedClasses = computed(() => {
     const classes = ['note-card'];
     
@@ -43,6 +49,10 @@ export class NoteCard {
     return classes.join(' ');
   });
 
+  /**
+   * Maps note color to CSS custom property value
+   * @returns CSS color value for note background
+   */
   noteColorValue = computed(() => {
     const colorMap: Record<NoteColor, string> = {
       yellow: 'var(--color-noteYellow)',
@@ -58,30 +68,55 @@ export class NoteCard {
     return colorMap[this.note().color] || 'var(--color-background)';
   });
 
+  /**
+   * Handles card click events
+   */
   onCardClick(): void {
     this.cardClick.emit(this.note());
   }
 
+  /**
+   * Handles pin toggle button clicks
+   * @param event - Click event to stop propagation
+   */
   onTogglePin(event: Event): void {
     event.stopPropagation();
     this.togglePin.emit(this.note().id);
   }
 
+  /**
+   * Handles menu button clicks
+   * @param event - Click event to stop propagation and provide positioning
+   */
   onMenuClick(event: Event): void {
     event.stopPropagation();
     this.menuClick.emit({ event, note: this.note() });
   }
 
+  /**
+   * Handles tag clicks
+   * @param event - Click event to stop propagation
+   * @param tag - Tag that was clicked
+   */
   onTagClick(event: Event, tag: string): void {
     event.stopPropagation();
     this.tagClick.emit(tag);
   }
 
+  /**
+   * Gets truncated content for preview display
+   * @returns Truncated content string with ellipsis if needed
+   */
   getPreviewContent(): string {
     const content = this.note().content || '';
     return content.length > 150 ? content.substring(0, 150) + '...' : content;
   }
 
+  /**
+   * Formats date for display with relative time
+   * @param date - Date to format
+   * @returns Human-readable date string
+   */
   formatDate(date: Date): string {
     if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
       return 'Unknown date';

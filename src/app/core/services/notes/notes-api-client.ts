@@ -3,22 +3,33 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { Note, CreateNoteRequest, UpdateNoteRequest, NotesFilter } from '@core/models';
 
+/**
+ * Data transfer object for note API responses
+ */
 interface NoteDto {
   id: string;
   title: string;
   content: string;
-  createdAt: string; // ISO string
+  createdAt: string;
   updatedAt: string;
   tags: string[];
   color: Note['color'];
   isPinned: boolean;
 }
 
+/**
+ * HTTP client service for notes API operations
+ */
 @Injectable({ providedIn: 'root' })
 export class NotesApiClient {
   private http = inject(HttpClient);
   private readonly baseUrl = '/api/notes';
 
+  /**
+   * Retrieves notes with optional filtering
+   * @param filters - Optional filters to apply
+   * @returns Observable of filtered notes array
+   */
   getNotes(filters?: NotesFilter): Observable<Note[]> {
     let params = new HttpParams();
     if (filters) {
@@ -32,19 +43,39 @@ export class NotesApiClient {
       .pipe(map((dtos) => dtos.map(mapNoteDtoToModel)));
   }
 
+  /**
+   * Creates a new note
+   * @param payload - Note creation data
+   * @returns Observable of created note
+   */
   createNote(payload: CreateNoteRequest): Observable<Note> {
     return this.http.post<NoteDto>(this.baseUrl, payload).pipe(map(mapNoteDtoToModel));
   }
 
+  /**
+   * Updates an existing note
+   * @param payload - Note update data including ID
+   * @returns Observable of updated note
+   */
   updateNote(payload: UpdateNoteRequest): Observable<Note> {
     return this.http.patch<NoteDto>(`${this.baseUrl}/${payload.id}`, payload).pipe(map(mapNoteDtoToModel));
   }
 
+  /**
+   * Deletes a note by ID
+   * @param id - ID of note to delete
+   * @returns Observable that completes when deletion is done
+   */
   deleteNote(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }
 
+/**
+ * Maps API DTO to domain model with date conversion
+ * @param dto - Note DTO from API
+ * @returns Note domain model
+ */
 function mapNoteDtoToModel(dto: NoteDto): Note {
   return {
     ...dto,

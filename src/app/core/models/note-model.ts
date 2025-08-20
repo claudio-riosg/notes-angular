@@ -1,3 +1,6 @@
+/**
+ * Core note entity representing a user's note
+ */
 export interface Note {
   id: string;
   title: string;
@@ -9,6 +12,9 @@ export interface Note {
   isPinned: boolean;
 }
 
+/**
+ * Request payload for creating a new note
+ */
 export interface CreateNoteRequest {
   title: string;
   content: string;
@@ -17,6 +23,9 @@ export interface CreateNoteRequest {
   isPinned?: boolean;
 }
 
+/**
+ * Request payload for updating an existing note
+ */
 export interface UpdateNoteRequest {
   id: string;
   title?: string;
@@ -26,6 +35,9 @@ export interface UpdateNoteRequest {
   isPinned?: boolean;
 }
 
+/**
+ * Available colors for notes
+ */
 export type NoteColor =
   | 'yellow'
   | 'blue'
@@ -36,6 +48,9 @@ export type NoteColor =
   | 'pink'
   | 'gray';
 
+/**
+ * Filter criteria for notes search and filtering
+ */
 export interface NotesFilter {
   searchTerm: string;
   selectedTags: string[];
@@ -43,6 +58,9 @@ export interface NotesFilter {
   showPinnedOnly: boolean;
 }
 
+/**
+ * Application state shape for notes feature
+ */
 export interface NotesState {
   notes: Note[];
   filter: NotesFilter;
