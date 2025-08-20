@@ -1,6 +1,9 @@
 import { Component, input, output, ChangeDetectionStrategy, signal, effect } from '@angular/core';
 import { Note } from '@core/models';
 
+/**
+ * Context menu component for note actions with click-outside and escape handling
+ */
 @Component({
   selector: 'note-context-menu',
   imports: [],
@@ -9,12 +12,10 @@ import { Note } from '@core/models';
   styleUrl: './note-context-menu.css'
 })
 export class NoteContextMenu {
-  // Inputs
   isVisible = input.required<boolean>();
   note = input<Note | null>(null);
   position = input<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  // Outputs
   edit = output<Note>();
   togglePin = output<Note>();
   duplicate = output<Note>();
@@ -53,21 +54,33 @@ export class NoteContextMenu {
     });
   }
 
+  /**
+   * Handles edit action for the note
+   */
   onEdit(note: Note): void {
     this.edit.emit(note);
     this.close.emit();
   }
 
+  /**
+   * Handles pin toggle action for the note
+   */
   onTogglePin(note: Note): void {
     this.togglePin.emit(note);
     this.close.emit();
   }
 
+  /**
+   * Handles duplicate action for the note
+   */
   onDuplicate(note: Note): void {
     this.duplicate.emit(note);
     this.close.emit();
   }
 
+  /**
+   * Handles delete action for the note
+   */
   onDelete(note: Note): void {
     this.delete.emit(note);
     this.close.emit();
